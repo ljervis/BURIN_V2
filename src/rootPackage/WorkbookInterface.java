@@ -1,9 +1,10 @@
 package rootPackage;
 
-public interface Workbook {
-
+public interface WorkbookInterface {
+	
 	boolean isValid();
 	
 	void read();
 	
+	void setSheet(int index);
 }
