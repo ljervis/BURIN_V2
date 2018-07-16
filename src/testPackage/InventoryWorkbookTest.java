@@ -2,24 +2,21 @@ package testPackage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.BeforeClass;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import rootPackage.WorkOrderWorkbook;
-import rootPackage.WorkbookInterface;
+import rootPackage.InventoryWorkbook;
 
-class WorkOrderWorkbookTest {
+class InventoryWorkbookTest {
 	
-	WorkOrderWorkbook validWB;
-	WorkOrderWorkbook invalidWB;
+	InventoryWorkbook validWB;
+	InventoryWorkbook invalidWB;
 
 	@BeforeEach
 	void setUp() throws Exception {
-		validWB = new WorkOrderWorkbook(".\\src\\Files\\160A11V.xlsx");
-		invalidWB = new WorkOrderWorkbook(".\\src\\Files\\InvalidWorkbook.xlsx");
+		validWB = new InventoryWorkbook(".\\src\\Files\\InventoryWorkbookTest.xlsx");
+		invalidWB = new InventoryWorkbook(".\\src\\Files\\InvalidWorkbook.xlsx");
 		
 		
 		validWB.setSheet(0);
@@ -51,26 +48,10 @@ class WorkOrderWorkbookTest {
 	}
 	
 	@Test
-	void checkFloorStockValid() {
-		assertEquals(7, validWB.checkFloorStock());
-	}
-	
-	@Test
-	void checkFloorStockInvalid() {
-		assertEquals(-1, invalidWB.checkFloorStock());
-	}
-	
-	@Test
-	void checkIsValid() {
-		assertTrue(validWB.isValid());
-		assertFalse(invalidWB.isValid());
-	}
-	
-	@Test
 	void partListPopulationValid() {
 		validWB.partNumStartRow = validWB.checkPartNum();
-		validWB.floorStockStartRow = validWB.checkFloorStock();
 		validWB.read();
 		validWB.printPartList();
 	}
+
 }

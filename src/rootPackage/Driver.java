@@ -12,7 +12,7 @@ public class Driver {
 			
 			//Create new workbooks
 			WorkbookInterface workOrderWB = new WorkOrderWorkbook(".\\src\\Files\\160A110V.xlsx");
-			WorkbookInterface inventoryWB = new InventoryWorkbook(".\\src\\Files\\INVENTORY WORK BOOK _2018.xlsx");
+			WorkbookInterface inventoryWB = new InventoryWorkbook(".\\src\\Files\\InventoryWorkbook.xlsx");
 			
 			//Set the first sheet in the workbooks as active
 			workOrderWB.setSheet(0);

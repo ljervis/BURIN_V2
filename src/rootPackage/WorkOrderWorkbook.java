@@ -3,7 +3,7 @@ package rootPackage;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -18,35 +18,40 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	
 	Workbook workbook;
 	Sheet sheet;
-	Hashtable partList;
-	public int partNumStartRow;
-	public int floorStockStartRow;
+	HashMap<Integer,Integer> partList;
+	int partNumStartRow;
+	int floorStockStartRow;
 	
 	// Constants for validating the work order
 	final String WOH = "work order";
 	final String WOP = "part#";
 	final String WOF = "floor stock";
 	
-	// Open workbook with OPCPackage 
+	/*
+	 *  Open workbook with OPCPackage 
+	 */
 	public WorkOrderWorkbook(OPCPackage pgk) throws Exception {
 		
 		workbook = new XSSFWorkbook(pgk);
 	}
 	
-	// Open workbook with workbook factory 
+	/*
+	 *  Open workbook with workbook factory 
+	 */
 	public WorkOrderWorkbook(String file) throws Exception {
 		
 		InputStream inp = new FileInputStream(file);
 		workbook = WorkbookFactory.create(inp);
 	}
 	
-	// Check to see if the word "work order" is in cell A1
+	/*
+	 *  Check to see if the words "work order" is in cell A1
+	 */
 	public boolean checkHeader() {
 		
 		Row row = sheet.getRow(0);
 		Cell cell = row.getCell(0);
-		if(cell == null) {return false;} 
-		if(cell.getCellTypeEnum() == CellType.STRING && cell.getStringCellValue().trim().equalsIgnoreCase(WOH)) {return true;}
+		if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(WOH)) {return true;}
 		return false;
 	}
 	
@@ -87,7 +92,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	}
 	
 	/*
-	 * Return true if a cell is a valid part number, return false otherwise
+	 * Return true if a cell is a valid string
 	 */
 	public boolean checkStringCellValid(Cell cell) {
 		
@@ -95,11 +100,27 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return true;
 	}
 	
+	/*
+	 * Return true if a cell holds a valid number
+	 */
 	public boolean checkNumericCellValid(Cell cell) {
 		
 		if(cell == null || cell.getCellTypeEnum() != CellType.NUMERIC) {return false;}
 		return true;
 	}
+	
+	/*
+	 * Print out parts and quantities 
+	 */
+	public void printPartList() {
+		for(Integer key : partList.keySet()) {
+			String part = key.toString();
+			String qty = partList.get(key).toString();
+			System.out.println(part + " " + qty);
+		}
+	}
+	
+	public HashMap<Integer, Integer> getPartList() {return partList;}
 	
 	@Override
 	public void setSheet(int index) {
@@ -125,20 +146,19 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	@Override
 	public void read() {
 		
-		partList = new Hashtable<Integer, Integer>();
+		partList = new HashMap<Integer, Integer>();
 		
 		for(int x = partNumStartRow+1; x < floorStockStartRow; x++) {
 			Row row = sheet.getRow(x);
 			Cell partNumCell = row.getCell(0);
 			Cell qtyCell = row.getCell(1);
-			Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
-			Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
-			if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {partList.put(partNumValue, qtyValue);}
+			
+			if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {
+				Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
+				Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
+				partList.put(partNumValue, qtyValue);
+			}
 		}
-		
-		Enumeration items = partList.keys();
-		while(items.hasMoreElements()) {System.out.println(items.nextElement());}
-		
 	}
 
 }
