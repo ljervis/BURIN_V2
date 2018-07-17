@@ -128,6 +128,10 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		sheet = workbook.getSheetAt(index);
 	}
 	
+	public void setPartNumStartRow(int num) {partNumStartRow = num;}
+	
+	public void setFloorStockStartRow(int num) {floorStockStartRow = num;}
+	
 	/* 
 	 * Returns true if the work order has a valid format (i.e. header, part numbers), false otherwise
 	 */

@@ -18,7 +18,7 @@ class WorkOrderWorkbookTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		validWB = new WorkOrderWorkbook(".\\src\\Files\\160A11V.xlsx");
+		validWB = new WorkOrderWorkbook(".\\src\\Files\\160A110V.xlsx");
 		invalidWB = new WorkOrderWorkbook(".\\src\\Files\\InvalidWorkbook.xlsx");
 		
 		
@@ -42,7 +42,7 @@ class WorkOrderWorkbookTest {
 	
 	@Test
 	void checkPartNumValid() {
-		assertEquals(1, validWB.checkPartNum());
+		assertEquals(7, validWB.checkPartNum());
 	}
 	
 	@Test
@@ -52,7 +52,7 @@ class WorkOrderWorkbookTest {
 	
 	@Test
 	void checkFloorStockValid() {
-		assertEquals(7, validWB.checkFloorStock());
+		assertEquals(20, validWB.checkFloorStock());
 	}
 	
 	@Test
@@ -68,8 +68,8 @@ class WorkOrderWorkbookTest {
 	
 	@Test
 	void partListPopulationValid() {
-		validWB.partNumStartRow = validWB.checkPartNum();
-		validWB.floorStockStartRow = validWB.checkFloorStock();
+		validWB.setPartNumStartRow(validWB.checkPartNum());
+		validWB.setFloorStockStartRow(validWB.checkFloorStock());
 		validWB.read();
 		validWB.printPartList();
 	}
