@@ -36,7 +36,7 @@ class ComparatorTest {
 		workOrderWB.setFloorStockStartRow(workOrderWB.checkFloorStock());
 		workOrderWB.read();
 		
-		inventoryWB.partNumStartRow = inventoryWB.checkPartNum();
+		inventoryWB.setPartNumStartRow(inventoryWB.checkPartNum());
 		inventoryWB.read();
 		
 		invList = inventoryWB.getPartList();

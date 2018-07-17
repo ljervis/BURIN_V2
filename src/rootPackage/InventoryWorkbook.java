@@ -18,7 +18,8 @@ public class InventoryWorkbook implements WorkbookInterface {
 	Workbook workbook;
 	Sheet sheet;
 	HashMap<Integer,Integer> partList;
-	public int partNumStartRow;
+	int multiplier;
+	int partNumStartRow;
 	
 	// Constants for validating the inventory work book
 	final String IH = "inventory work book";
@@ -29,6 +30,7 @@ public class InventoryWorkbook implements WorkbookInterface {
 	 */
 	public InventoryWorkbook(OPCPackage pgk) throws Exception {
 		workbook = new XSSFWorkbook(pgk);
+		multiplier = 1;
 	}
 	
 	/*
@@ -38,6 +40,7 @@ public class InventoryWorkbook implements WorkbookInterface {
 		
 		InputStream inp = new FileInputStream(file);
 		workbook = WorkbookFactory.create(inp);
+		multiplier = 1;
 	}
 	
 	/*
@@ -95,6 +98,20 @@ public class InventoryWorkbook implements WorkbookInterface {
 		}
 	}
 	
+	/*
+	 * Return the part:quantity hashmap
+	 */
+	public HashMap<Integer,Integer> getPartList(){return partList;}
+	
+	/*
+	 * Set the multiplier of this workbook
+	 */
+	public void setMultiplier(int mult) { multiplier = mult; }
+	
+	/*
+	 * Set the part numbers header row
+	 */
+	public void setPartNumStartRow(int num) {partNumStartRow = num;}
 	
 	@Override 
 	public void setSheet(int index) {
@@ -112,8 +129,6 @@ public class InventoryWorkbook implements WorkbookInterface {
 		return true;
 	}
 	
-	public HashMap<Integer,Integer> getPartList(){return partList;}
-
 	/*
 	 * Parse the work order sheet and populate the part list
 	 */
@@ -131,7 +146,7 @@ public class InventoryWorkbook implements WorkbookInterface {
 			if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {
 				Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
 				Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
-				partList.put(partNumValue, qtyValue);
+				partList.put(partNumValue, qtyValue * multiplier);
 			}
 		}
 	}

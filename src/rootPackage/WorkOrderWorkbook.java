@@ -21,6 +21,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	HashMap<Integer,Integer> partList;
 	int partNumStartRow;
 	int floorStockStartRow;
+	int multiplier;
 	
 	// Constants for validating the work order
 	final String WOH = "work order";
@@ -33,6 +34,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	public WorkOrderWorkbook(OPCPackage pgk) throws Exception {
 		
 		workbook = new XSSFWorkbook(pgk);
+		multiplier = 1;
 	}
 	
 	/*
@@ -42,6 +44,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		
 		InputStream inp = new FileInputStream(file);
 		workbook = WorkbookFactory.create(inp);
+		multiplier = 1;
 	}
 	
 	/*
@@ -122,14 +125,25 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	
 	public HashMap<Integer, Integer> getPartList() {return partList;}
 	
+	/*
+	 * Set the multiplier of this workbook
+	 */
+	public void setMultiplier(int mult) { multiplier = mult; }
+	
 	@Override
 	public void setSheet(int index) {
 		
 		sheet = workbook.getSheetAt(index);
 	}
 	
+	/*
+	 * Set the part numbers header row
+	 */
 	public void setPartNumStartRow(int num) {partNumStartRow = num;}
 	
+	/*
+	 * Set the part numbers ending row
+	 */
 	public void setFloorStockStartRow(int num) {floorStockStartRow = num;}
 	
 	/* 
@@ -160,7 +174,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 			if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {
 				Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
 				Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
-				partList.put(partNumValue, qtyValue);
+				partList.put(partNumValue, qtyValue * multiplier);
 			}
 		}
 	}

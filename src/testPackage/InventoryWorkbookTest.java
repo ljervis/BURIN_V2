@@ -49,9 +49,19 @@ class InventoryWorkbookTest {
 	
 	@Test
 	void partListPopulationValid() {
-		validWB.partNumStartRow = validWB.checkPartNum();
+		System.out.println("PartList test");
+		validWB.setPartNumStartRow(validWB.checkPartNum());
 		validWB.read();
 		validWB.printPartList();
+	}
+	
+	@Test
+	void multiplier() {
+		System.out.println("multiplier test");
+		validWB.setPartNumStartRow(validWB.checkPartNum());
+		validWB.setMultiplier(2);
+		validWB.read();
+		validWB.printPartList(); 
 	}
 
 }
