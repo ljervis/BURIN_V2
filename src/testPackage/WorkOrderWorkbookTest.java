@@ -41,23 +41,23 @@ class WorkOrderWorkbookTest {
 	}
 	
 	@Test
-	void checkPartNumValid() {
-		assertEquals(7, validWB.checkPartNum());
+	void checkStartValid() {
+		assertEquals(8, validWB.checkStart());
 	}
 	
 	@Test
-	void checkPartNumInvalid() {
-		assertEquals(-1, invalidWB.checkPartNum());
+	void checkStartInvalid() {
+		assertEquals(-1, invalidWB.checkStart());
 	}
 	
 	@Test
-	void checkFloorStockValid() {
-		assertEquals(20, validWB.checkFloorStock());
+	void checkEndValid() {
+		assertEquals(20, validWB.checkEnd());
 	}
 	
 	@Test
-	void checkFloorStockInvalid() {
-		assertEquals(-1, invalidWB.checkFloorStock());
+	void checkEndInvalid() {
+		assertEquals(-1, invalidWB.checkEnd());
 	}
 	
 	@Test
@@ -69,8 +69,8 @@ class WorkOrderWorkbookTest {
 	@Test
 	void partListPopulationValid() {
 		System.out.println("PartList test");
-		validWB.setPartNumStartRow(validWB.checkPartNum());
-		validWB.setFloorStockStartRow(validWB.checkFloorStock());
+		validWB.setStartRow(validWB.checkStart());
+		validWB.setEndRow(validWB.checkEnd());
 		validWB.read();
 		validWB.printPartList();
 	}
@@ -78,8 +78,8 @@ class WorkOrderWorkbookTest {
 	@Test
 	void multiplier() {
 		System.out.println("multiplier test");
-		validWB.setPartNumStartRow(validWB.checkPartNum());
-		validWB.setFloorStockStartRow(validWB.checkFloorStock());
+		validWB.setStartRow(validWB.checkStart());
+		validWB.setEndRow(validWB.checkEnd());
 		validWB.setMultiplier(2);
 		validWB.read();
 		validWB.printPartList(); 

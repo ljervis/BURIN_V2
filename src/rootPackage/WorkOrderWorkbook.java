@@ -19,14 +19,14 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	Workbook workbook;
 	Sheet sheet;
 	HashMap<Integer,Integer> partList;
-	int partNumStartRow;
-	int floorStockStartRow;
+	int partStartRow;
+	int partEndRow;
 	int multiplier;
 	
 	// Constants for validating the work order
 	final String WOH = "work order";
-	final String WOP = "part#";
-	final String WOF = "floor stock";
+	final String WOS = "start";
+	final String WOE = "end";
 	
 	/*
 	 *  Open workbook with OPCPackage 
@@ -63,11 +63,11 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	 * Assumption that checkHeader() returned true
 	 */
 	
-	public int checkPartNum() {
+	public int checkStart() {
 		
 		for(Row row : sheet) {
 			Cell cell = row.getCell(0);
-			if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(WOP)) {return row.getRowNum();}
+			if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(WOS)) {return row.getRowNum();}
 		}
 		return -1;
 	}
@@ -76,21 +76,21 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	 * Check to see if the word "floor stock" is in column A and return the row index or -1 if not present
 	 * Assumption that isValid() returned true
 	 */
-	public int checkFloorStock() {
+	public int checkEnd() {
 		
 		for(Row row: sheet) {
 			Cell cell = row.getCell(0);
-			if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(WOF)) {return row.getRowNum();}
+			if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(WOE)) {return row.getRowNum();}
 		}
 		return -1;
 	}
 	
 	/*
 	 * Return true if parts above floor stock, false otherwise
-	 * Assumption that partNumStartRow and floorStockStartRow have been initialized
+	 * Assumption that partStartRow and partEndRow have been initialized
 	 */
 	public boolean checkRowsValid() {
-		if(floorStockStartRow > partNumStartRow) {return true;}
+		if(partEndRow > partStartRow) {return true;}
 		return false;
 	}
 	
@@ -139,12 +139,12 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	/*
 	 * Set the part numbers header row
 	 */
-	public void setPartNumStartRow(int num) {partNumStartRow = num;}
+	public void setStartRow(int num) {partStartRow = num;}
 	
 	/*
 	 * Set the part numbers ending row
 	 */
-	public void setFloorStockStartRow(int num) {floorStockStartRow = num;}
+	public void setEndRow(int num) {partEndRow = num;}
 	
 	/* 
 	 * Returns true if the work order has a valid format (i.e. header, part numbers), false otherwise
@@ -153,8 +153,9 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	public boolean isValid() {
 		
 		if(!checkHeader()) {return false;}
-		partNumStartRow = checkPartNum();
-		if (partNumStartRow == -1) {return false;}
+		partStartRow = checkStart();
+		partEndRow = checkEnd();
+		if (partStartRow == -1 || partEndRow == -1) {return false;}
 		return true;
 	}
 
@@ -166,7 +167,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		
 		partList = new HashMap<Integer, Integer>();
 		
-		for(int x = partNumStartRow+1; x < floorStockStartRow; x++) {
+		for(int x = partStartRow+1; x < partEndRow; x++) {
 			Row row = sheet.getRow(x);
 			Cell partNumCell = row.getCell(0);
 			Cell qtyCell = row.getCell(1);
