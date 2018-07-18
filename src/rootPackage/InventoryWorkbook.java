@@ -1,8 +1,13 @@
 package rootPackage;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -38,9 +43,16 @@ public class InventoryWorkbook implements WorkbookInterface {
 	 */
 	public InventoryWorkbook(String file) throws Exception {
 		
-		InputStream inp = new FileInputStream(file);
+		File inp = new File(file);
 		workbook = WorkbookFactory.create(inp);
 		multiplier = 1;
+	}
+	
+	/*
+	 * Close the workbook
+	 */
+	public void closeWB() throws IOException {
+		workbook.close();
 	}
 	
 	/*
@@ -113,6 +125,14 @@ public class InventoryWorkbook implements WorkbookInterface {
 	 */
 	public void setPartNumStartRow(int num) {partNumStartRow = num;}
 	
+	/*
+	 * Display an error message to the user 
+	 */
+	public void errorMessage(String message) {
+		JOptionPane.showMessageDialog(new JFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	
 	@Override 
 	public void setSheet(int index) {
 		sheet = workbook.getSheetAt(index);
@@ -123,9 +143,15 @@ public class InventoryWorkbook implements WorkbookInterface {
 	 */
 	@Override
 	public boolean isValid() {
-		if(!checkHeader()) {return false;}
+		if(!checkHeader()) {
+			errorMessage("Invalid inventory workbook detected. Make sure cell A1 contains the words \"inventory work book\". Please upload a valid inventory workbook.");
+			return false;
+		}
 		partNumStartRow = checkPartNum();
-		if (partNumStartRow == -1) {return false;}
+		if (partNumStartRow == -1) {
+			errorMessage("Invalid inventory workbook detected. Make sure there is a cell containing the word \"part#\". Please upload a valid inventory workbook.");
+			return false;
+		}
 		return true;
 	}
 	
