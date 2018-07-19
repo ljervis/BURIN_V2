@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,6 +24,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import rootPackage.InventoryWorkbook;
+import java.awt.SystemColor;
 
 public class WelcomeWindow {
 
@@ -30,7 +32,6 @@ public class WelcomeWindow {
 	private JFrame windowFrame;
 	private JPanel contentPane;
 	private JLabel textLabel;
-	private JTextPane dragDropArea;
 	
 	private File inventoryFile;
 	private InventoryWorkbook inventoryWB;
@@ -66,23 +67,19 @@ public class WelcomeWindow {
 		
 		windowFrame = new JFrame();
 		windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		windowFrame.setTitle("Burin");
+		windowFrame.setTitle("Burin - Inventory Workbook Selection");
 		windowFrame.setBounds(300, 300, 600, 600);
 		
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.PAGE_AXIS));
+		contentPane.setBackground(SystemColor.inactiveCaption);
+		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.X_AXIS));
+		contentPane.setTransferHandler(new FileDropHandler());
 		
 		textLabel = new JLabel("please select the inventory workbook by dragging and dropping the excel file below");
-		textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
-		dragDropArea = new JTextPane();
-		dragDropArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-		dragDropArea.setBackground(Color.CYAN);
-		dragDropArea.setTransferHandler(new FileDropHandler());
-
+		contentPane.add(Box.createHorizontalGlue());
 		contentPane.add(textLabel);
-		contentPane.add(dragDropArea);
+		contentPane.add(Box.createHorizontalGlue());
 
 		windowFrame.setContentPane(contentPane);
 	}
