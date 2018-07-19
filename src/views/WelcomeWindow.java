@@ -83,7 +83,6 @@ public class WelcomeWindow {
 
 		contentPane.add(textLabel);
 		contentPane.add(dragDropArea);
-		dragDropArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		windowFrame.setContentPane(contentPane);
 	}
