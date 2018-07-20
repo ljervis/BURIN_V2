@@ -2,6 +2,8 @@ package views;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.stream.IntStream;
+
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
@@ -181,9 +183,20 @@ public class Explorator {
 		for(File f : workOrderFiles) {
 			if(f.getName().equals(workOrderName)) {
 				try {
+					
+					Integer[] range = new Integer[20];
+					for(int i = 0; i < 20; i++) {
+						range[i] = new Integer(i+1);
+					}
+					
+					// Prompt the user for the number of work orders to process 
+					Integer mult = (Integer) JOptionPane.showInputDialog(exploratorFrame, workOrderName + 
+							"\n How many work orders would you like to process?",
+							"Work Order Selection", JOptionPane.PLAIN_MESSAGE, null, range, range[0]);
+					
 					// This will need to be changed in the future to reflect the permanent location
 					String workOrderPath = ".\\src\\Files\\WorkOrders\\"+ workOrderName;
-					workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, 1));
+					workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, mult.intValue()));
 					dataTable.refreshTable(workOrderWBList);
 				}catch(Exception e) {
 					e.printStackTrace();
