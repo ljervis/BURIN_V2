@@ -18,12 +18,8 @@ class WorkOrderWorkbookTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		validWB = new WorkOrderWorkbook(".\\src\\Files\\160A110V.xlsx");
-		invalidWB = new WorkOrderWorkbook(".\\src\\Files\\InvalidWorkbook.xlsx");
-		
-		
-		validWB.setSheet(0);
-		invalidWB.setSheet(0);
+		validWB = new WorkOrderWorkbook(".\\src\\Files\\160A110V.xlsx",1);
+		invalidWB = new WorkOrderWorkbook(".\\src\\Files\\InvalidWorkbook.xlsx",1);
 	}
 	
 	@AfterEach

@@ -22,6 +22,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	int partStartRow;
 	int partEndRow;
 	int multiplier;
+	String workbookName;
 	
 	// Constants for validating the work order
 	final String WOH = "work order";
@@ -40,11 +41,19 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	/*
 	 *  Open workbook with workbook factory 
 	 */
-	public WorkOrderWorkbook(String file) throws Exception {
+	public WorkOrderWorkbook(String file, int mult) throws Exception {
 		
 		InputStream inp = new FileInputStream(file);
 		workbook = WorkbookFactory.create(inp);
-		multiplier = 1;
+		multiplier = mult;
+		workbookName = file.substring(file.lastIndexOf("\\"));
+		setSheet(0);
+		if(!isValid()) {System.out.println("InvalidWB");}
+		else {read();}
+	}
+	
+	public String getWorkbookName() {
+		return workbookName;
 	}
 	
 	/*
