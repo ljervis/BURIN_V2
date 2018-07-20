@@ -43,11 +43,11 @@ public class Explorator {
 	private JTable table;
 	
 	private InventoryWorkbook invWB;	// The inventory workbook to be processed
-	private ArrayList<WorkOrderWorkbook> workOrderWBList;	// 
-	private File[] workOrderFiles;
-	private ArrayList<String> workOrderNames;
-	private String workOrderDirectory; 
-	private Set<Integer> currentPartList;
+	private ArrayList<WorkOrderWorkbook> workOrderWBList;	//	List of all work orders that are currently being processed
+	private File[] workOrderFiles; //	Files in the work order folder
+	private ArrayList<String> workOrderNames;	// The names of all work orders in the work order folder
+	private String workOrderDirectory;	// The path of the work order folder
+	private Set<Integer> currentPartList;	// An ordered set that holds all the part numbers currently being processed 
 	
 	/**
 	 * Constructor for the explorator window that allows for work order manipulation and part stock visualization
@@ -69,7 +69,9 @@ public class Explorator {
 
 	
 	/**
-	 * Create the window
+	 * Creates the explorator window and gets the work orders in the work order folder.
+	 * If no work orders are found the program will exit.
+	 * If there are work orders it will add them to the work order list and add the table to the window. 
 	 */
 	public void setUpWindow() {
 		
@@ -87,9 +89,14 @@ public class Explorator {
 		exploratorFrame.setContentPane(contentPane);
 	}
 	
+	/**
+	 * Create and add the table in a scroll pane with default column names to the window. 
+	 * The table is not editable by the user but rows can be selected. 
+	 * 
+	 */
 	public void addTable() {
 		
-		String[] columnNames = new String[] {"Part Number","Qty In Stock", "Total Qty Needed", "Qty Remaining"};
+		String[] columnNames = new String[] {"Part Number","Qty In Stock", "Total Qty Needed", "Qty Remaining"};	// The default column names
 		
 		tableModel = new DefaultTableModel(columnNames, 0) {
 
@@ -108,9 +115,12 @@ public class Explorator {
 		contentPane.add(scrollPane);
 	}
 	
-	/*
+	/**
 	 * Retrieves the names of all files in the given directory. Returns true if at least
-	 * one file was present in the folder and false if no files were found
+	 * one file was present in the folder and false if no files were found.
+	 * 
+	 * @param dir the path to the work order directory to be searched
+	 * @exception e thrown if the folder was not found
 	 */
 	public boolean getWorkOrders(String dir) {
 		
@@ -132,7 +142,7 @@ public class Explorator {
 		return workOrdersPresent;
 	}
 	
-	/*
+	/**
 	 * Create and add the work order list to the window.
 	 * The work order list should will have at least one element. 
 	 * The list items can be selected with a mouse click and a pop up menu will be shown for that selection
@@ -168,8 +178,11 @@ public class Explorator {
 		contentPane.add(Box.createHorizontalGlue());
 	}
 	
-	/*
+	/**
 	 * Show pop up menu for adding and removing the selected work order from the table.
+	 * 
+	 * @param listIndex the index of the selection on the work order list
+	 * @param listValue the name of the work order selected on the list
 	 */
 	public void displayPopUpMenu(int listIndex, String listValue) {
 		
@@ -191,9 +204,12 @@ public class Explorator {
 		});
 	}
 	
-	/*
-	 * Adds the selected work order to the array list by searching for the work order name in the work order folder.
-	 * Refreshes the table to reflect the additional work order
+	/**
+	 * Adds the selected work order to the work order list by searching for selected work orders name in the work order folder.
+	 * Refreshes the table to reflect the additional work order.
+	 * 
+	 * @param workOrderName the name of the work order selected on the list
+	 * @exception e there was a problem loading the work order
 	 */
 	public void addWorkOrder(String workOrderName) {
 		for(File f : workOrderFiles) {
@@ -210,52 +226,78 @@ public class Explorator {
 		}
 	}
 	
-	/*
-	 * Refresh the table. This will update any of the work orders that have been added or removed from the array list
+	/**
+	 * This is executed each time a work order is added or removed from the work order list. 
+	 * Scans all the work orders in the work order list for parts to display and populates the table by comparing quantities with the inventory work book
 	 */
 	public void refreshTable() {
 		
-		currentPartList = new TreeSet<Integer>();
+		currentPartList = new TreeSet<Integer>();	// Reset the part list
 		Vector<String> columnNames = new Vector<String>();
-		Vector<Vector<Integer>> tableData = new Vector<Vector<Integer>>();
-		columnNames.add("Part Number"); columnNames.add("Qty In Stock");
+
+		columnNames.add("Part Number"); 
+		columnNames.add("Qty In Stock");
 		for(WorkOrderWorkbook n : workOrderWBList) { 
-			columnNames.add(n.getWorkbookName()); 
-			currentPartList.addAll(n.getPartList().keySet());
+			columnNames.add(n.getWorkbookName());	// Add each workbook that is in the work book list as a column in the table
+			currentPartList.addAll(n.getPartList().keySet());	// Add all parts in each workbook to the part list set from their hash map
 		}
-		columnNames.add("Total Qty Needed"); columnNames.add("Qty Remaining");
+		columnNames.add("Total Qty Needed"); 
+		columnNames.add("Qty Remaining");
 		
+		tableModel = new DefaultTableModel(populateTableData(), columnNames) {
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+		       //all cells false
+		       return false;
+		    }
+		};
+		table.setModel(tableModel);
+	}
+	
+	/**
+	 * Use the currentPartList and scan the inventory work book and each work order in the work 
+	 * order list to populate the data that will be added to the table. 
+	 * 
+	 * @return a vector of vectors that will be used in the table model
+	 */
+	public Vector<Vector<Integer>> populateTableData(){
+		Vector<Vector<Integer>> tableData = new Vector<Vector<Integer>>();
+		
+		// Create a row for each part in the part list set
 		for(Integer i : currentPartList) {
 			Vector<Integer> row = new Vector<Integer>();
 			row.add(i);
 			Integer invQty = invWB.getPartList().get(i);
-			if(invQty != null) { row.add(invWB.getPartList().get(i)); } 
+					
+			if(invQty != null) { 
+				row.add(invWB.getPartList().get(i)); 
+			} 
 			else { 
 				System.out.println(i.toString() + " not found in inventory workbook");
 				continue; 
 			}
+					
 			int totalQtyNeeded = 0;
+					
 			for(WorkOrderWorkbook n : workOrderWBList) {
 				Integer part = n.getPartList().get(i);
 				if(part != null) { 
-					row.add(part); 
+					row.add(part);	// Add the number of parts needed for each work order from their hash maps 
 					totalQtyNeeded += part.intValue();
 				}
-				else { row.add(new Integer(0)); }
+				else { row.add(new Integer(0)); }	// Add 0 parts if the workbooks hash map does not contain the part number 
 			}
-			row.add(new Integer(totalQtyNeeded));
-			row.add(new Integer(row.get(1).intValue() - totalQtyNeeded));
+			row.add(new Integer(totalQtyNeeded));	// Add the total number of parts needed across all work orders
+			row.add(new Integer(row.get(1).intValue() - totalQtyNeeded)); // Add the remaining parts in inventory after all parts needed have been removed
 			tableData.add(row);
 		}
-		
-		tableModel = new DefaultTableModel(tableData, columnNames);
-		table.setModel(tableModel);
-		
-		System.out.println(currentPartList);
+		return tableData;
 	}
 	
-	/*
+	/**
 	 * Display an error message to the user 
+	 * 
+	 * @param message the error message to display
 	 */
 	public void errorMessage(String message) {
 		JOptionPane.showMessageDialog(new JFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);

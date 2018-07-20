@@ -111,6 +111,7 @@ public class WelcomeWindow {
 	
 	/**
 	 * Display an error message to the user 
+	 * @param message the error message to display
 	 */
 	public void errorMessage(String message) {
 		JOptionPane.showMessageDialog(new JFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);
