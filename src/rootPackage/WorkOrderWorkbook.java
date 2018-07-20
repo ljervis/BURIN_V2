@@ -46,7 +46,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		InputStream inp = new FileInputStream(file);
 		workbook = WorkbookFactory.create(inp);
 		multiplier = mult;
-		workbookName = file.substring(file.lastIndexOf("\\"));
+		workbookName = file.substring(file.lastIndexOf("\\")+1, file.lastIndexOf("."));
 		setSheet(0);
 		if(!isValid()) {System.out.println("InvalidWB");}
 		else {read();}

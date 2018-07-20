@@ -1,28 +1,19 @@
 package views;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.GraphicsConfiguration;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.TransferHandler;
-import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
-
 import rootPackage.InventoryWorkbook;
 import java.awt.SystemColor;
 
@@ -37,7 +28,7 @@ public class WelcomeWindow {
 	private InventoryWorkbook inventoryWB;
 	
 	/**
-	 * Launch the application.
+	 * The main method that launches the program. Swing GUI objects are run on the event dispatch thread. 
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -54,14 +45,14 @@ public class WelcomeWindow {
 	}
 
 	/**
-	 * Constructor
+	 * Constructor for the initial window that is displayed when the program starts
 	 */
 	public WelcomeWindow() {
 		setUpWindow();
 	}
 	
-	/*
-	 * Create the window
+	/**
+	 * Creates a window with a JPanel that has a drag and drop file transfer handler
 	 */
 	public void setUpWindow() {
 		
@@ -84,14 +75,18 @@ public class WelcomeWindow {
 		windowFrame.setContentPane(contentPane);
 	}
 	
-	/*
-	 * Import the inventory file specified by the user
+	/**
+	 * Finds and processes the inventory work book specified by the user if the workbook is valid and open the explorator window. 
+	 * 
+	 * @exception an unknown error occurred when opening the file path. Check the stack trace for more information
 	 */
 	public void importInventoryWB() {
+		
 		try {
 			inventoryWB = new InventoryWorkbook(inventoryFile.getAbsolutePath());
 			inventoryWB.setSheet(0);
-			if(inventoryWB.isValid()) {
+			if(inventoryWB.isValid()) { // run checks to make sure the file given is a valid inventory work book
+				inventoryWB.read();
 				openExplorator();
 			}
 			else {
@@ -100,10 +95,12 @@ public class WelcomeWindow {
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
+			errorMessage("A problem occured when trying to open the inventory work book.");
+			System.exit(0);
 		}
 	}
 	
-	/*
+	/**
 	 * Open the explorator window and close the welcome window
 	 */
 	public void openExplorator() {
@@ -112,14 +109,15 @@ public class WelcomeWindow {
     	windowFrame.setVisible(false);
 	}
 	
-	/*
+	/**
 	 * Display an error message to the user 
 	 */
 	public void errorMessage(String message) {
 		JOptionPane.showMessageDialog(new JFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
-	/*
+	/**
+	 * Try to check whether the transfered file is valid. 
 	 * Display error message dialogs if more that one file was selected, a directory was selected, or the file does not have a ".xlsx" extension
 	 */
 	public boolean checkValidFile(List<File> fileList) {
@@ -143,8 +141,8 @@ public class WelcomeWindow {
 		return true;
 	}
 	
-	/*
-	 * Handler for drag and drop file feature
+	/**
+	 * File handler for dragging and dropping the inventory work book file
 	 */
 	final class FileDropHandler extends TransferHandler {
 	    @Override
