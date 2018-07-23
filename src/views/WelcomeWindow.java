@@ -95,7 +95,7 @@ public class WelcomeWindow {
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
-			errorMessage("A problem occured when trying to open the inventory work book.");
+			errorMessage("A problem occured when trying to open the inventory work book. Please make sure the file is closed and restart the program.");
 			System.exit(0);
 		}
 	}

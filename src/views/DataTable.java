@@ -12,8 +12,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.RowFilter;
+import javax.swing.RowFilter.ComparisonType;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import rootPackage.InventoryWorkbook;
 import rootPackage.WorkOrderWorkbook;
@@ -26,6 +30,7 @@ public class DataTable {
 	DefaultTableModel tableModel;
 	Set<Integer> currentPartList;
 	
+	private TableRowSorter<TableModel> sorter;
 	InventoryWorkbook invWB;
 	
 	/**
@@ -84,6 +89,8 @@ public class DataTable {
 		    }
 		};
 		table.setModel(tableModel);
+		sorter = new TableRowSorter<TableModel>(tableModel);
+		table.setRowSorter(sorter);
 	}
 	
 	/**
@@ -126,5 +133,24 @@ public class DataTable {
 		return tableData;
 	}
 	
+	public void filterInStock() {
+		RowFilter<TableModel, Object> rf = null;
+		try {
+			rf = RowFilter.numberFilter(ComparisonType.AFTER, -1, tableModel.getColumnCount()-1);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		sorter.setRowFilter(rf);
+	}
+	
+	public void filterOutOfStock() {
+		RowFilter<TableModel, Object> rf = null;
+		try {
+			rf = RowFilter.numberFilter(ComparisonType.BEFORE, 0, tableModel.getColumnCount()-1);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		sorter.setRowFilter(rf);
+	}
 
 }

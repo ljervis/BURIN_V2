@@ -52,8 +52,20 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		else {read();}
 	}
 	
+	/**
+	 * 
+	 * @return the name of the workbook with its file extension removed
+	 */
 	public String getWorkbookName() {
 		return workbookName;
+	}
+	
+	/**
+	 * 
+	 * @return the multiplicity or the number of workbooks processed
+	 */
+	public int getMultiplicity() {
+		return multiplier;
 	}
 	
 	/*
