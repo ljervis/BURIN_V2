@@ -1,6 +1,7 @@
 package views;
 
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,6 +25,7 @@ public class WelcomeWindow {
 	private JFrame windowFrame;
 	private JPanel contentPane;
 	private JLabel textLabel;
+	private ImageIcon fileIcon;
 	
 	private File inventoryFile;
 	private InventoryWorkbook inventoryWB;
@@ -66,7 +69,9 @@ public class WelcomeWindow {
 		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.X_AXIS));
 		contentPane.setTransferHandler(new FileDropHandler());
 		
-		textLabel = new JLabel("please select the inventory workbook by dragging and dropping the excel file below");
+		textLabel = new JLabel("Drag and drop the inventory workbook here");
+		Font boldItalicFont = new Font("Serif", Font.BOLD+Font.ITALIC, 24);
+		textLabel.setFont(boldItalicFont);
 		
 		contentPane.add(Box.createHorizontalGlue());
 		contentPane.add(textLabel);

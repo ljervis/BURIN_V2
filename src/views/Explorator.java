@@ -6,6 +6,8 @@ import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -13,6 +15,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+
+import org.apache.poi.hemf.record.HemfText.SetTextColor;
+
 import rootPackage.InventoryWorkbook;
 import rootPackage.WorkOrderWorkbook;
 
@@ -47,6 +52,9 @@ public class Explorator {
 	private String workOrderDirectory;	// The path of the work order folder
 	private DataTable dataTable;
 	private Options optionsPane;
+	private MenuBar menu;
+	
+	private int mHoverIndex;
 	
 	/**
 	 * Constructor for the explorator window that allows for work order manipulation and part stock visualization
@@ -55,6 +63,9 @@ public class Explorator {
 	 * @see InventoryWorkbook
 	 */
 	public Explorator(InventoryWorkbook wb) {
+		
+		mHoverIndex = -1;
+		
 		// This will need to be changed to the permanent work order folder before shipping 
 		workOrderDirectory = "C:\\Users\\luke\\eclipse-workspace\\BURIN_V2\\src\\Files\\WorkOrders";
 		
@@ -86,8 +97,8 @@ public class Explorator {
 		populateWorkOrderList();
 		dataTable = new DataTable(invWB);
 		contentPane.add(dataTable.getTable());
-		optionsPane = new Options(dataTable);
-		contentPane.add(optionsPane.getOptionsPane());
+		menu = new MenuBar(dataTable);
+		exploratorFrame.setJMenuBar(menu.getMenu());
 		exploratorFrame.setContentPane(contentPane);
 	}
 	
@@ -146,18 +157,31 @@ public class Explorator {
 			}
 		});
 		
+		workOrderList.addMouseMotionListener(new MouseAdapter() {
+			public void mouseMoved(MouseEvent e) {
+				 Point p = new Point(e.getX(),e.getY());
+				 int index = workOrderList.locationToIndex(p);
+				 if (index != mHoverIndex) {
+					 mHoverIndex = index;
+					 workOrderList.repaint();
+				 }
+			}
+		});
+		
 		// The cell rendered changes the labels 
 		workOrderList.setCellRenderer(new DefaultListCellRenderer() {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			      Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			      if(isSelected) {
-		    		  setBackground(Color.LIGHT_GRAY);
-		    	  }
+			      Color backgroundColor = mHoverIndex == index ? Color.lightGray : Color.white;
+			      setBackground(backgroundColor);
+				  setBorder(noFocusBorder);
+				  
 			      for(WorkOrderWorkbook w : workOrderWBList) {
 			    	  if(w.getWorkbookName().equals(value)) {
-			    		  setText(value + " x " + w.getMultiplicity()); // This changes the text but not the value of the selection
-			    		  setBackground(Color.GRAY);
+			    		  setText(w.getMultiplicity() + " x " + value); // This changes the text but not the value of the selection
+			    		  setBackground(Color.yellow);
+			    		  setForeground(Color.white);
 			    	  }
 			      }
                   return c;
@@ -236,6 +260,14 @@ public class Explorator {
 				workOrderWBList.remove(x);
 			}
 		}
+		dataTable.refreshTable(workOrderWBList);
+	}
+	
+	/**
+	 * Remove all work orders from the work order list and refresh the table 
+	 */
+	public void removeAllWorkOrders() {
+		workOrderWBList.clear();
 		dataTable.refreshTable(workOrderWBList);
 	}
 	

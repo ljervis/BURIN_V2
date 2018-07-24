@@ -75,7 +75,7 @@ public class DataTable {
 		columnNames.add("Part Number"); 
 		columnNames.add("Qty In Stock");
 		for(WorkOrderWorkbook n : workOrderWBList) { 
-			columnNames.add(n.getWorkbookName());	// Add each workbook that is in the work book list as a column in the table
+			columnNames.add(n.getMultiplicity() + " x " + n.getWorkbookName());	// Add each workbook that is in the work book list as a column in the table
 			currentPartList.addAll(n.getPartList().keySet());	// Add all parts in each workbook to the part list set from their hash map
 		}
 		columnNames.add("Total Qty Needed"); 
@@ -133,6 +133,9 @@ public class DataTable {
 		return tableData;
 	}
 	
+	/**
+	 * Adds a row filter to the table so that only parts with a stock qty < 0 are shown 
+	 */
 	public void filterInStock() {
 		RowFilter<TableModel, Object> rf = null;
 		try {
@@ -140,9 +143,14 @@ public class DataTable {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		sorter.setRowFilter(rf);
+		if(sorter != null) {
+			sorter.setRowFilter(rf);
+		}
 	}
 	
+	/**
+	 * Adds a row filter to the table so that only parts with a stock qty > -1 are shown 
+	 */
 	public void filterOutOfStock() {
 		RowFilter<TableModel, Object> rf = null;
 		try {
@@ -150,7 +158,18 @@ public class DataTable {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		sorter.setRowFilter(rf);
+		if(sorter != null) {
+			sorter.setRowFilter(rf);
+		}
+	}
+	
+	/**
+	 * Removes the current row filter to show all values in the table model 
+	 */
+	public void removeRowFilter() {
+		if(sorter != null) {
+			sorter.setRowFilter(null);
+		}
 	}
 
 }
