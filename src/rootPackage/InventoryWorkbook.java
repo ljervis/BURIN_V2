@@ -108,6 +108,11 @@ public class InventoryWorkbook implements WorkbookInterface {
 		}
 	}
 	
+	/**
+	 * Update the inventory workbook with the given values
+	 * @return
+	 */
+	
 	/*
 	 * Return the part:quantity hashmap
 	 */

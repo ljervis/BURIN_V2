@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.SystemColor;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -151,7 +152,7 @@ public class DataTable {
 		}
 		if(!missingParts.equals("")) {
 			missingParts = "The following parts were not found in the inventory workbook and will not be shown:\n" + missingParts;
-			JOptionPane.showMessageDialog(new JFrame(), missingParts.substring(0, missingParts.lastIndexOf(",")), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), missingParts.substring(0, missingParts.lastIndexOf(",")), "Warning", JOptionPane.WARNING_MESSAGE);
 		}
 		return tableData;
 	}
@@ -192,6 +193,39 @@ public class DataTable {
 	public void removeRowFilter() {
 		if(sorter != null) {
 			sorter.setRowFilter(null);
+		}
+	}
+	
+	/**
+	 * Updates the inventory workbook with the current tables values. Negative quantities are shows as 0 in the workbook
+	 */
+	public void updateInventoryWorkbook() {
+		ArrayList<InventoryContainer> inventoryUpdates = new ArrayList<InventoryContainer>();
+		int rowCount = tableModel.getRowCount();
+		int colCount = tableModel.getColumnCount();
+		for(int x = 0; x < rowCount; x++) {
+			Integer part = (Integer)tableModel.getValueAt(x, 0);
+			Integer qty = (Integer)tableModel.getValueAt(x, colCount-1);
+			int qtyAdj = qty.intValue() >= 0 ? qty.intValue() : 0;
+			InventoryContainer i = new InventoryContainer(part.intValue(), qtyAdj);
+			inventoryUpdates.add(i);
+		}
+		// Testing 
+		Iterator<InventoryContainer> iter = inventoryUpdates.iterator();
+		while(iter.hasNext()){
+			InventoryContainer curr = iter.next();
+			System.out.println(curr.part + "\t" + curr.qty);
+		}
+	}
+	
+	// Object to hold the part and qty values for updating the inventory 
+	public class InventoryContainer{
+		public int part;
+		public int qty;
+		
+		public InventoryContainer(int p, int q) {
+			part = p;
+			qty = q;
 		}
 	}
 
