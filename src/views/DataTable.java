@@ -1,7 +1,5 @@
 package views;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.SystemColor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,19 +9,17 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.ComparisonType;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import rootPackage.InventoryWorkbook;
+import rootPackage.Pair;
 import rootPackage.WorkOrderWorkbook;
-import javax.swing.UIManager;
 
 public class DataTable {
 	
@@ -91,20 +87,11 @@ public class DataTable {
 		       return false;
 		    }
 			
-			// Allows the table columns to be sorted correctly by returning Integers 
+			// Allows the table columns to be sorted correctly by returning Integers
+			// This will need to be changed if the table is to support any other objects 
 			@Override
 			public Class<?> getColumnClass(int column){
-	              Class<?> returnValue;
-	              if ((column >= 0) && (column < getColumnCount())) 
-	              {
-	                  returnValue = getValueAt(0, column).getClass();
-	              } 
-	              else 
-	              {
-	                 returnValue = Object.class;
-	              }
-
-	              return returnValue;
+				return Integer.class;
 			}
 		};
 		table.setModel(tableModel);
@@ -125,10 +112,11 @@ public class DataTable {
 		for(Integer i : currentPartList) {
 			Vector<Integer> row = new Vector<Integer>();
 			row.add(i);
-			Integer invQty = invWB.getPartList().get(i);
+			Pair invPair = invWB.getPartList().get(i);
 					
-			if(invQty != null) { 
-				row.add(invWB.getPartList().get(i)); 
+			if(invPair != null) { 
+				Integer invQty = invPair.first;
+				row.add(invQty); 
 			} 
 			else { 
 				missingParts += i.toString() + ", ";
@@ -197,36 +185,30 @@ public class DataTable {
 	}
 	
 	/**
-	 * Updates the inventory workbook with the current tables values. Negative quantities are shows as 0 in the workbook
+	 * Updates the inventory workbook with the current tables values. Negative quantities are shows as 0 in the workbook. 
+	 * Will only update if there are parts in the table model
 	 */
 	public void updateInventoryWorkbook() {
-		ArrayList<InventoryContainer> inventoryUpdates = new ArrayList<InventoryContainer>();
+		ArrayList<Pair> inventoryUpdates = new ArrayList<Pair>();
 		int rowCount = tableModel.getRowCount();
 		int colCount = tableModel.getColumnCount();
 		for(int x = 0; x < rowCount; x++) {
 			Integer part = (Integer)tableModel.getValueAt(x, 0);
 			Integer qty = (Integer)tableModel.getValueAt(x, colCount-1);
-			int qtyAdj = qty.intValue() >= 0 ? qty.intValue() : 0;
-			InventoryContainer i = new InventoryContainer(part.intValue(), qtyAdj);
+			Integer qtyAdj = qty.intValue() >= 0 ? qty : new Integer(0);
+			Pair i = new Pair(part, qtyAdj);
 			inventoryUpdates.add(i);
 		}
-		// Testing 
-		Iterator<InventoryContainer> iter = inventoryUpdates.iterator();
-		while(iter.hasNext()){
-			InventoryContainer curr = iter.next();
-			System.out.println(curr.part + "\t" + curr.qty);
-		}
-	}
-	
-	// Object to hold the part and qty values for updating the inventory 
-	public class InventoryContainer{
-		public int part;
-		public int qty;
 		
-		public InventoryContainer(int p, int q) {
-			part = p;
-			qty = q;
+		if(inventoryUpdates.size() > 0) {
+			invWB.updateInventoryWorkbook(inventoryUpdates);
+		}
+		
+		// Testing 
+		Iterator<Pair> iter = inventoryUpdates.iterator();
+		while(iter.hasNext()){
+			Pair curr = iter.next();
+			System.out.println(curr.first.intValue() + "\t" + curr.second.intValue());
 		}
 	}
-
 }
