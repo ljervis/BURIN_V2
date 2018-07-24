@@ -6,8 +6,6 @@ import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -15,8 +13,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-
-import org.apache.poi.hemf.record.HemfText.SetTextColor;
 
 import rootPackage.InventoryWorkbook;
 import rootPackage.WorkOrderWorkbook;
@@ -295,8 +291,10 @@ public class Explorator {
 					
 					// This will need to be changed in the future to reflect the permanent location
 					String workOrderPath = ".\\src\\Files\\WorkOrders\\"+ workOrderName + ".xlsx";
-					workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, mult.intValue()));
-					dataTable.refreshTable(workOrderWBList);
+					if(mult != null) {
+						workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, mult.intValue()));
+						dataTable.refreshTable(workOrderWBList);
+					}
 				}catch(Exception e) {
 					e.printStackTrace();
 				}

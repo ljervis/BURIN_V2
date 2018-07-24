@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -21,6 +22,7 @@ import javax.swing.table.TableRowSorter;
 
 import rootPackage.InventoryWorkbook;
 import rootPackage.WorkOrderWorkbook;
+import javax.swing.UIManager;
 
 public class DataTable {
 	
@@ -53,7 +55,7 @@ public class DataTable {
 		};
 		
 		table = new JTable(tableModel);
-		table.setBackground(SystemColor.activeCaptionBorder);
+		table.setBackground(SystemColor.activeCaption);
 		table.setFillsViewportHeight(true);
 		
 		tableScrollPane = new JScrollPane(table);
@@ -101,7 +103,7 @@ public class DataTable {
 	 */
 	public Vector<Vector<Integer>> populateTableData(ArrayList<WorkOrderWorkbook> workOrderWBList){
 		Vector<Vector<Integer>> tableData = new Vector<Vector<Integer>>();
-		
+		String missingParts = "";
 		// Create a row for each part in the part list set
 		for(Integer i : currentPartList) {
 			Vector<Integer> row = new Vector<Integer>();
@@ -112,8 +114,9 @@ public class DataTable {
 				row.add(invWB.getPartList().get(i)); 
 			} 
 			else { 
+				missingParts += i.toString() + ", ";
 				System.out.println(i.toString() + " not found in inventory workbook");
-				continue; 
+				continue;	// If the part was not found in the inventory workbook this row will not be added to the table
 			}
 					
 			int totalQtyNeeded = 0;
@@ -129,6 +132,10 @@ public class DataTable {
 			row.add(new Integer(totalQtyNeeded));	// Add the total number of parts needed across all work orders
 			row.add(new Integer(row.get(1).intValue() - totalQtyNeeded)); // Add the remaining parts in inventory after all parts needed have been removed
 			tableData.add(row);
+		}
+		if(!missingParts.equals("")) {
+			missingParts = "The following parts were not found in the inventory workbook and will not be shown:\n" + missingParts;
+			JOptionPane.showMessageDialog(new JFrame(), missingParts.substring(0, missingParts.lastIndexOf(",")), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		return tableData;
 	}
