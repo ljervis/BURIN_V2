@@ -89,6 +89,22 @@ public class DataTable {
 		       //all cells false
 		       return false;
 		    }
+			
+			// Allows the table columns to be sorted correctly by returning Integers 
+			@Override
+			public Class<?> getColumnClass(int column){
+	              Class<?> returnValue;
+	              if ((column >= 0) && (column < getColumnCount())) 
+	              {
+	                  returnValue = getValueAt(0, column).getClass();
+	              } 
+	              else 
+	              {
+	                 returnValue = Object.class;
+	              }
+
+	              return returnValue;
+			}
 		};
 		table.setModel(tableModel);
 		sorter = new TableRowSorter<TableModel>(tableModel);
