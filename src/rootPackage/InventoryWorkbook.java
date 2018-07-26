@@ -28,6 +28,7 @@ public class InventoryWorkbook implements WorkbookInterface {
 	HashMap<Integer, Pair> partList;
 	int partNumStartRow;
 	String workbookFileName;
+	String updateMessage;
 	
 	// Constants for validating the inventory work book
 	final String IH = "inventory work book";
@@ -48,6 +49,7 @@ public class InventoryWorkbook implements WorkbookInterface {
 		workbookFileName = file;
 		File inp = new File(file);
 		workbook = WorkbookFactory.create(inp);
+		updateMessage = "";
 		
 	}
 	
@@ -76,7 +78,6 @@ public class InventoryWorkbook implements WorkbookInterface {
 	public int checkPartNum() {
 		
 		for(Row row : sheet) {
-			System.out.println("test");
 			if(row != null) {
 				Cell cell = row.getCell(0);
 				if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(IP)) {return row.getRowNum();}
@@ -128,20 +129,28 @@ public class InventoryWorkbook implements WorkbookInterface {
 		Iterator<Pair> iter = invUpdate.iterator();
 		while(iter.hasNext()) {
 			Pair invUpdatePair = iter.next();
-			Pair partListPair = partList.get(invUpdatePair.first);
-			Row row = sheet.getRow(partListPair.second);
-			Cell cell = row.getCell(1);
-			cell.setCellValue(invUpdatePair.second.intValue()); // Update the inventory workbook with the new qty value 
+			Pair partListPair = partList.get(invUpdatePair.first); // Get the part # entry in the inventory part list with the part # from the invUpdate
+			Row row = sheet.getRow(partListPair.second); // Get this part #'s row in the inventory work book that was previously saved
+			Cell cell = row.getCell(1); // Get the quantity cell for this part # 
+			cell.setCellValue(invUpdatePair.second.intValue()); // Update the inventory workbook with the new quantitiy as reflected on the table  
 			
 			partListPair.first = invUpdatePair.second; // Update the part list with the new qty value
+			
+			updateMessage += invUpdatePair.first.toString() + " | " + invUpdatePair.second.toString() + "\n";
 		}
 		
 		try {
 			FileOutputStream f = new FileOutputStream("testWorkbook.xlsx");
 			workbook.write(f);
 			f.close();
+			
+			updateMessage = "The inventory workbook was sucessfully updated!\nAll parts and their updated quantities are shown below:\n" + updateMessage;
+			JOptionPane.showMessageDialog(new JFrame(), updateMessage);
 		}catch(Exception e){
+			JOptionPane.showMessageDialog(new JFrame(), "The inventory workbook could not be updated, "
+					+ "please review the documentation and try again", "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			System.exit(1);
 		}
 		
 	}

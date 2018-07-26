@@ -1,8 +1,6 @@
 package views;
 
-import java.awt.SystemColor;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -33,28 +31,16 @@ public class DataTable {
 	InventoryWorkbook invWB;
 	
 	/**
-	 * Constructor to create and add the table in a scroll pane with default column names to the window. 
-	 * The table is not editable by the user but rows can be selected. 
+	 * Constructor to create and add the table in a scroll pane to the window. 
+	 * The table is not populated with a table model until the user adds a work order 
 	 * 
 	 */
 	public DataTable(InventoryWorkbook inv) {
 		
 		invWB = inv;
 		
-		String[] columnNames = new String[] {"Part Number","Qty In Stock", "Total Qty Needed", "Qty Remaining"};	// The default column names
-		
-		tableModel = new DefaultTableModel(columnNames, 0) {
-		    @Override
-		    public boolean isCellEditable(int row, int column) {
-		       //all cells false
-		       return false;
-		    }
-		};
-		
-		table = new JTable(tableModel);
-		table.setBackground(SystemColor.activeCaption);
-		table.setFillsViewportHeight(true);
-		
+		table = new JTable();
+
 		tableScrollPane = new JScrollPane(table);
 	}
 	
@@ -97,6 +83,7 @@ public class DataTable {
 		table.setModel(tableModel);
 		sorter = new TableRowSorter<TableModel>(tableModel);
 		table.setRowSorter(sorter);
+		
 	}
 	
 	/**
@@ -120,7 +107,7 @@ public class DataTable {
 			} 
 			else { 
 				missingParts += i.toString() + ", ";
-				System.out.println(i.toString() + " not found in inventory workbook");
+//				System.out.println(i.toString() + " not found in inventory workbook");
 				continue;	// If the part was not found in the inventory workbook this row will not be added to the table
 			}
 					
@@ -195,7 +182,7 @@ public class DataTable {
 		for(int x = 0; x < rowCount; x++) {
 			Integer part = (Integer)tableModel.getValueAt(x, 0);
 			Integer qty = (Integer)tableModel.getValueAt(x, colCount-1);
-			Integer qtyAdj = qty.intValue() >= 0 ? qty : new Integer(0);
+			Integer qtyAdj = qty.intValue() >= 0 ? qty : new Integer(0);	// If the qty is negative then add a 0 
 			Pair i = new Pair(part, qtyAdj);
 			inventoryUpdates.add(i);
 		}
@@ -205,10 +192,10 @@ public class DataTable {
 		}
 		
 		// Testing 
-		Iterator<Pair> iter = inventoryUpdates.iterator();
-		while(iter.hasNext()){
-			Pair curr = iter.next();
-			System.out.println(curr.first.intValue() + "\t" + curr.second.intValue());
-		}
+//		Iterator<Pair> iter = inventoryUpdates.iterator();
+//		while(iter.hasNext()){
+//			Pair curr = iter.next();
+//			System.out.println(curr.first.intValue() + "\t" + curr.second.intValue());
+//		}
 	}
 }
