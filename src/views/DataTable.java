@@ -1,20 +1,29 @@
 package views;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.SystemColor;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.ComparisonType;
+import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import rootPackage.CustomTableCellRenderer;
 import rootPackage.InventoryWorkbook;
 import rootPackage.Pair;
 import rootPackage.WorkOrderWorkbook;
@@ -26,6 +35,7 @@ public class DataTable {
 	JTable table;
 	DefaultTableModel tableModel;
 	Set<Integer> currentPartList;
+	CustomTableCellRenderer renderer;
 	
 	private TableRowSorter<TableModel> sorter;
 	InventoryWorkbook invWB;
@@ -40,8 +50,13 @@ public class DataTable {
 		invWB = inv;
 		
 		table = new JTable();
-
+		table.setRowHeight(25);
+		table.setFont(new Font("Times New Roman", Font.PLAIN, 25));
+//		renderer = new DefaultTableCellRenderer();
+		
+		Border panelBorder = BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder());
 		tableScrollPane = new JScrollPane(table);
+		tableScrollPane.setBorder(panelBorder);
 	}
 	
 	public JScrollPane getTable() {
@@ -81,7 +96,16 @@ public class DataTable {
 			}
 		};
 		table.setModel(tableModel);
+		JTableHeader tableHeader = table.getTableHeader();
+		tableHeader.setBackground(SystemColor.inactiveCaption);
+		tableHeader.setFont(new Font("Times New Roman", Font.BOLD, 24));
 		sorter = new TableRowSorter<TableModel>(tableModel);
+		
+		renderer = new CustomTableCellRenderer();
+		for(int i = 0; i < table.getColumnCount(); i++) {
+			table.setDefaultRenderer(table.getColumnClass(i), renderer);
+		}
+		
 		table.setRowSorter(sorter);
 		
 	}
@@ -136,21 +160,21 @@ public class DataTable {
 	 * Adds a row filter to the table so that only parts with a stock qty < 0 are shown 
 	 */
 	public void filterInStock() {
+		if(tableModel == null) {return;} // table model has yet to be set up
 		RowFilter<TableModel, Object> rf = null;
 		try {
 			rf = RowFilter.numberFilter(ComparisonType.AFTER, -1, tableModel.getColumnCount()-1);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		if(sorter != null) {
-			sorter.setRowFilter(rf);
-		}
+		sorter.setRowFilter(rf);
 	}
 	
 	/**
 	 * Adds a row filter to the table so that only parts with a stock qty > -1 are shown 
 	 */
 	public void filterOutOfStock() {
+		if(tableModel == null) {return;} // table model has yet to be set up
 		RowFilter<TableModel, Object> rf = null;
 		try {
 			rf = RowFilter.numberFilter(ComparisonType.BEFORE, 0, tableModel.getColumnCount()-1);
@@ -166,6 +190,8 @@ public class DataTable {
 	 * Removes the current row filter to show all values in the table model 
 	 */
 	public void removeRowFilter() {
+		if(tableModel == null) {return;} // table model has yet to be set up
+		Font boldItalicFont = new Font("Serif", Font.BOLD, 26);
 		if(sorter != null) {
 			sorter.setRowFilter(null);
 		}

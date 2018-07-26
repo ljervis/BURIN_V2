@@ -2,9 +2,12 @@ package views;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -13,12 +16,15 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 
 import rootPackage.InventoryWorkbook;
 import rootPackage.WorkOrderWorkbook;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -29,6 +35,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Dimension;
+import java.awt.SystemColor;
+import javax.swing.UIManager;
 
 public class Explorator {
 
@@ -47,9 +56,7 @@ public class Explorator {
 	private ArrayList<String> workOrderNames;	// The names of all work orders in the work order folder
 	private String workOrderDirectory;	// The path of the work order folder
 	private DataTable dataTable;
-	private Options optionsPane;
 	private MenuBar menu;
-	
 	private int mHoverIndex;
 	
 	/**
@@ -132,6 +139,13 @@ public class Explorator {
 	 */
 	public void populateWorkOrderList() {
 		
+		JLabel listHeader = new JLabel("Avalible Work Orders", JLabel.CENTER);
+		listHeader.setOpaque(true);
+		Border panelBorder = BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder());
+		listHeader.setBorder(BorderFactory.createLineBorder(Color.black));
+		listHeader.setBackground(SystemColor.inactiveCaption);
+		
+		listHeader.setFont(new Font("Times New Roman", Font.BOLD, 25));
 		
 		contentPane = new JPanel();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.LINE_AXIS));
@@ -142,6 +156,7 @@ public class Explorator {
 		}
 		
 		workOrderList = new JList<String>(listModel);
+		workOrderList.setFont(new Font("Times New Roman", Font.PLAIN, 20));
 		
 		workOrderList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent mouseEvent) {
@@ -169,7 +184,7 @@ public class Explorator {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			      Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			      Color backgroundColor = mHoverIndex == index ? Color.lightGray : Color.white;
+			      Color backgroundColor = mHoverIndex == index ? SystemColor.inactiveCaption : Color.white;
 			      setBackground(backgroundColor);
 				  setBorder(noFocusBorder);
 				  
@@ -188,9 +203,13 @@ public class Explorator {
 		workOrderList.setLayoutOrientation(JList.VERTICAL);	
 		
 		listScroller = new JScrollPane(workOrderList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			
+		listScroller.setMaximumSize(new Dimension(350, 32767));
+		listScroller.setPreferredSize(new Dimension(350, 130));
+		listScroller.setColumnHeaderView(listHeader);
+		listScroller.setBorder(panelBorder);
+		
 		contentPane.add(listScroller);
-		contentPane.add(Box.createHorizontalGlue());
+//		contentPane.add(Box.createHorizontalGlue());
 	}
 	
 	/**
@@ -217,6 +236,9 @@ public class Explorator {
 		popup = new JPopupMenu("Edit");
 		addItem = new JMenuItem("Add Work Order");
 		removeItem = new JMenuItem("Remove Work Order");
+		
+		addItem.setFont(new Font("Serif", Font.PLAIN, 18));
+		removeItem.setFont(new Font("Serif", Font.PLAIN, 18));
 
 		if(inWorkOrderList(listValue)) {
 			addItem.setEnabled(false);

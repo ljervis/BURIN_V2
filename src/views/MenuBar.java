@@ -1,8 +1,11 @@
 package views;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -11,6 +14,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.border.EtchedBorder;
 
 public class MenuBar {
 	
@@ -37,11 +41,20 @@ public class MenuBar {
 		
 		seperator.setEnabled(false);
 		
+		menuBar.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		fileMenu.setFont(new Font("Serif", Font.PLAIN, 18));
+		seperator.setFont(new Font("Serif", Font.PLAIN, 18));
+		viewMenu.setFont(new Font("Serif", Font.PLAIN, 18));
+		
 		viewBtnGroup = new ButtonGroup();
 		JRadioButtonMenuItem inStockOnly = new JRadioButtonMenuItem("Show In Stock");
 		JRadioButtonMenuItem outOfStockOnly = new JRadioButtonMenuItem("Show Out Of Stock");
 		JRadioButtonMenuItem allStock = new JRadioButtonMenuItem("Show All");
         allStock.setSelected(true);
+        
+        inStockOnly.setFont(new Font("Serif", Font.PLAIN, 18));
+        outOfStockOnly.setFont(new Font("Serif", Font.PLAIN, 18));
+        allStock.setFont(new Font("Serif", Font.PLAIN, 18));
         
 		viewBtnGroup.add(allStock);
 		viewBtnGroup.add(inStockOnly);
@@ -73,6 +86,9 @@ public class MenuBar {
         JMenuItem invUpdateBtn = new JMenuItem("Update Inventory");
         reportBtn.setToolTipText("Create an Excel workbook with in-stock and out-of-stock part sheets");
         invUpdateBtn.setToolTipText("Update the inventory workbook with the currently loaded work orders");
+        
+        reportBtn.setFont(new Font("Serif", Font.PLAIN, 18));
+        invUpdateBtn.setFont(new Font("Serif", Font.PLAIN, 18));
         
         reportBtn.addActionListener((ActionEvent e) -> {
         	
