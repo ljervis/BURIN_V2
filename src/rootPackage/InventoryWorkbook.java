@@ -146,6 +146,7 @@ public class InventoryWorkbook implements WorkbookInterface {
 			
 			updateMessage = "The inventory workbook was sucessfully updated!\nAll parts and their updated quantities are shown below:\n" + updateMessage;
 			JOptionPane.showMessageDialog(new JFrame(), updateMessage);
+			System.exit(0);
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(new JFrame(), "The inventory workbook could not be updated, "
 					+ "please review the documentation and try again", "Error", JOptionPane.ERROR_MESSAGE);

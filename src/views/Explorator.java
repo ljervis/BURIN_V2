@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -49,6 +50,7 @@ public class Explorator {
 	private JPopupMenu popup;
 	private JMenuItem addItem;
 	private JMenuItem removeItem;
+	private JLabel textLabel;
 	
 	private InventoryWorkbook invWB;	// The inventory workbook to be processed
 	private ArrayList<WorkOrderWorkbook> workOrderWBList;	//	List of all work orders that are currently being processed
@@ -58,6 +60,7 @@ public class Explorator {
 	private DataTable dataTable;
 	private MenuBar menu;
 	private int mHoverIndex;
+	private boolean firstAdd;
 	
 	/**
 	 * Constructor for the explorator window that allows for work order manipulation and part stock visualization
@@ -89,7 +92,7 @@ public class Explorator {
 	public void setUpWindow() {
 		
 		exploratorFrame = new JFrame("Burin - Explorator");
-		exploratorFrame.setBounds(300, 300, 1000, 1000);
+		exploratorFrame.setBounds(100, 100, 1000, 1000);
 		exploratorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		if (!getWorkOrders(workOrderDirectory)) { 
@@ -97,9 +100,13 @@ public class Explorator {
 			System.exit(0);
 		}
 		
+		textLabel = new JLabel(new ImageIcon("src/images/ExplorerIcon.png"));
+		
 		populateWorkOrderList();
 		dataTable = new DataTable(invWB);
-		contentPane.add(dataTable.getTable());
+		contentPane.add(textLabel);
+		firstAdd = false;
+//		contentPane.add(dataTable.getTable());
 		menu = new MenuBar(dataTable);
 		exploratorFrame.setJMenuBar(menu.getMenu());
 		exploratorFrame.setContentPane(contentPane);
@@ -146,6 +153,7 @@ public class Explorator {
 		listHeader.setBackground(SystemColor.inactiveCaption);
 		
 		listHeader.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		listHeader.setForeground(new Color(199, 21, 133));
 		
 		contentPane = new JPanel();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.LINE_AXIS));
@@ -157,6 +165,7 @@ public class Explorator {
 		
 		workOrderList = new JList<String>(listModel);
 		workOrderList.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+		workOrderList.setBackground(SystemColor.control);
 		
 		workOrderList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent mouseEvent) {
@@ -184,7 +193,7 @@ public class Explorator {
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			      Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			      Color backgroundColor = mHoverIndex == index ? SystemColor.inactiveCaption : Color.white;
+			      Color backgroundColor = mHoverIndex == index ? SystemColor.inactiveCaption : SystemColor.lightGray;
 			      setBackground(backgroundColor);
 				  setBorder(noFocusBorder);
 				  
@@ -314,6 +323,12 @@ public class Explorator {
 					// This will need to be changed in the future to reflect the permanent location
 					String workOrderPath = ".\\src\\Files\\WorkOrders\\"+ workOrderName + ".xlsx";
 					if(mult != null) {
+						if(!firstAdd) {
+							contentPane.remove(textLabel);
+							contentPane.revalidate();
+							contentPane.add(dataTable.getTable());
+							firstAdd = true;
+						}
 						workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, mult.intValue()));
 						dataTable.refreshTable(workOrderWBList);
 					}

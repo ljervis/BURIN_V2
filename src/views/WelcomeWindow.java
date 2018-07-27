@@ -62,19 +62,16 @@ public class WelcomeWindow {
 		windowFrame = new JFrame();
 		windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		windowFrame.setTitle("Burin - Inventory Workbook Selection");
-		windowFrame.setBounds(300, 300, 600, 600);
+		windowFrame.setBounds(300, 300, 500, 500);
 		
 		contentPane = new JPanel();
 		contentPane.setBackground(SystemColor.inactiveCaption);
 		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.X_AXIS));
 		contentPane.setTransferHandler(new FileDropHandler());
 		
-		textLabel = new JLabel(new ImageIcon("src/images/file.png"));
+		textLabel = new JLabel(new ImageIcon("src/images/WelcomeScreenImage.png"));
 		textLabel.setHorizontalTextPosition(JLabel.CENTER);
 		textLabel.setVerticalTextPosition(JLabel.TOP);
-		Font boldItalicFont = new Font("Serif", Font.BOLD, 26);
-		textLabel.setText("Please drag and drop the inventory workbook here");
-		textLabel.setFont(boldItalicFont);
 		
 		contentPane.add(Box.createHorizontalGlue());
 		contentPane.add(textLabel);

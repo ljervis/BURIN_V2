@@ -50,9 +50,10 @@ public class DataTable {
 		invWB = inv;
 		
 		table = new JTable();
+//		table.setGridColor(SystemColor.text);
 		table.setRowHeight(25);
 		table.setFont(new Font("Times New Roman", Font.PLAIN, 25));
-//		renderer = new DefaultTableCellRenderer();
+		
 		
 		Border panelBorder = BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder());
 		tableScrollPane = new JScrollPane(table);
@@ -97,17 +98,15 @@ public class DataTable {
 		};
 		table.setModel(tableModel);
 		JTableHeader tableHeader = table.getTableHeader();
+//		tableHeader.setReorderingAllowed(false);
 		tableHeader.setBackground(SystemColor.inactiveCaption);
 		tableHeader.setFont(new Font("Times New Roman", Font.BOLD, 24));
+		tableHeader.setForeground(new Color(199, 21, 133));
+		
 		sorter = new TableRowSorter<TableModel>(tableModel);
-		
 		renderer = new CustomTableCellRenderer();
-		for(int i = 0; i < table.getColumnCount(); i++) {
-			table.setDefaultRenderer(table.getColumnClass(i), renderer);
-		}
-		
+		table.setDefaultRenderer(Integer.class, renderer);
 		table.setRowSorter(sorter);
-		
 	}
 	
 	/**
@@ -202,26 +201,24 @@ public class DataTable {
 	 * Will only update if there are parts in the table model
 	 */
 	public void updateInventoryWorkbook() {
-		ArrayList<Pair> inventoryUpdates = new ArrayList<Pair>();
-		int rowCount = tableModel.getRowCount();
-		int colCount = tableModel.getColumnCount();
-		for(int x = 0; x < rowCount; x++) {
-			Integer part = (Integer)tableModel.getValueAt(x, 0);
-			Integer qty = (Integer)tableModel.getValueAt(x, colCount-1);
-			Integer qtyAdj = qty.intValue() >= 0 ? qty : new Integer(0);	// If the qty is negative then add a 0 
-			Pair i = new Pair(part, qtyAdj);
-			inventoryUpdates.add(i);
+		if(tableModel == null) {
+			JOptionPane.showMessageDialog(new JFrame(), "Please add a work order before updating the inventory work book", "Warning", JOptionPane.WARNING_MESSAGE);
 		}
-		
-		if(inventoryUpdates.size() > 0) {
-			invWB.updateInventoryWorkbook(inventoryUpdates);
+		else {
+			ArrayList<Pair> inventoryUpdates = new ArrayList<Pair>();
+			int rowCount = tableModel.getRowCount();
+			int colCount = tableModel.getColumnCount();
+			for(int x = 0; x < rowCount; x++) {
+				Integer part = (Integer)tableModel.getValueAt(x, 0);
+				Integer qty = (Integer)tableModel.getValueAt(x, colCount-1);
+				Integer qtyAdj = qty.intValue() >= 0 ? qty : new Integer(0);	// If the qty is negative then add a 0 
+				Pair i = new Pair(part, qtyAdj);
+				inventoryUpdates.add(i);
+			}
+			
+			if(inventoryUpdates.size() > 0) {
+				invWB.updateInventoryWorkbook(inventoryUpdates);
+			}
 		}
-		
-		// Testing 
-//		Iterator<Pair> iter = inventoryUpdates.iterator();
-//		while(iter.hasNext()){
-//			Pair curr = iter.next();
-//			System.out.println(curr.first.intValue() + "\t" + curr.second.intValue());
-//		}
 	}
 }

@@ -2,36 +2,43 @@ package rootPackage;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Arrays;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	
+	final String partCol = "Part Number";
+	final String inStockCol = "Qty In Stock";
+	final String totalCol = "Total Qty Needed";
+	final String remainingCol = "Qty Remaining";
+	String[] permCols;
+	
 	public CustomTableCellRenderer() {
 		super();
 		setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
+		permCols = new String[] {partCol, inStockCol, totalCol, remainingCol}; 
 	}
 	
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-		Integer val = (Integer)value;
-		if(value == null) {
-			value = "";
-			return cell;
-		}
-		if(val.intValue() < 0) {
-			cell.setBackground(Color.red);
-		}
-		else if(!table.getColumnName(column).equals("Part Number")) {
-			if(val.intValue() != 0) {
-				cell.setBackground(Color.yellow);
-			}
-		}
-		else {
-			cell.setBackground(null);
-		}
+		
+		Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, table.convertRowIndexToModel(row), table.convertColumnIndexToModel(column));
+		Object valueAt = table.getModel().getValueAt(table.convertRowIndexToModel(row), table.convertColumnIndexToModel(column));
+		setOpaque(true);
+		cell.setBackground(null);
+		if (valueAt != null) {
+			int val = Integer.parseInt(valueAt.toString());
+	        if(val < 0) {
+	        	cell.setBackground(Color.red);
+	        }
+	 		else if(table.convertColumnIndexToModel(column) > 1 && table.convertColumnIndexToModel(column) < (table.getColumnCount()-2)) {
+	 			if(val != 0) {
+	 				cell.setBackground(Color.lightGray);
+	 			}
+	 		}
+	    }
 		return cell;
 	}
 
