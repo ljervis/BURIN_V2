@@ -17,7 +17,7 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	
 	public CustomTableCellRenderer() {
 		super();
-		setHorizontalAlignment(DefaultTableCellRenderer.LEFT);
+		setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
 		permCols = new String[] {partCol, inStockCol, totalCol, remainingCol}; 
 	}
 	
@@ -31,7 +31,7 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 		if (valueAt != null) {
 			int val = Integer.parseInt(valueAt.toString());
 	        if(val < 0) {
-	        	cell.setBackground(Color.red);
+	        	cell.setBackground(Color.orange);
 	        }
 	 		else if(table.convertColumnIndexToModel(column) > 1 && table.convertColumnIndexToModel(column) < (table.getColumnCount()-2)) {
 	 			if(val != 0) {

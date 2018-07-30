@@ -1,5 +1,6 @@
 package rootPackage;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +12,8 @@ import java.util.Iterator;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -144,8 +147,13 @@ public class InventoryWorkbook implements WorkbookInterface {
 			workbook.write(f);
 			f.close();
 			
-			updateMessage = "The inventory workbook was sucessfully updated!\nAll parts and their updated quantities are shown below:\n" + updateMessage;
-			JOptionPane.showMessageDialog(new JFrame(), updateMessage);
+			JTextArea message = new JTextArea("The inventory workbook was sucessfully updated!\nAll parts and their updated quantities are shown below:\n" + updateMessage);
+			JScrollPane scrollPane = new JScrollPane(message);
+			message.setLineWrap(true);  
+			message.setWrapStyleWord(true); 
+			scrollPane.setPreferredSize( new Dimension( 500, 500 ) );
+//			updateMessage = "The inventory workbook was successfully updated!\nAll parts and their updated quantities are shown below:\n" + updateMessage;
+			JOptionPane.showMessageDialog(new JFrame(),scrollPane, "Inventory Update", JOptionPane.INFORMATION_MESSAGE);
 			System.exit(0);
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(new JFrame(), "The inventory workbook could not be updated, "

@@ -2,7 +2,9 @@ package views;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
@@ -30,6 +32,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 
 import java.awt.event.ActionEvent;
@@ -91,7 +94,7 @@ public class Explorator {
 	 */
 	public void setUpWindow() {
 		
-		exploratorFrame = new JFrame("Burin - Explorator");
+		exploratorFrame = new JFrame("Burin - Explorer");
 		exploratorFrame.setBounds(100, 100, 1000, 1000);
 		exploratorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -107,7 +110,7 @@ public class Explorator {
 		contentPane.add(textLabel);
 		firstAdd = false;
 //		contentPane.add(dataTable.getTable());
-		menu = new MenuBar(dataTable);
+		menu = new MenuBar(dataTable, workOrderWBList);
 		exploratorFrame.setJMenuBar(menu.getMenu());
 		exploratorFrame.setContentPane(contentPane);
 	}
@@ -146,7 +149,7 @@ public class Explorator {
 	 */
 	public void populateWorkOrderList() {
 		
-		JLabel listHeader = new JLabel("Avalible Work Orders", JLabel.CENTER);
+		JLabel listHeader = new JLabel("Available Work Orders", JLabel.CENTER);
 		listHeader.setOpaque(true);
 		Border panelBorder = BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder());
 		listHeader.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -200,8 +203,8 @@ public class Explorator {
 			      for(WorkOrderWorkbook w : workOrderWBList) {
 			    	  if(w.getWorkbookName().equals(value)) {
 			    		  setText(w.getMultiplicity() + " x " + value); // This changes the text but not the value of the selection
-			    		  setBackground(Color.yellow);
-			    		  setForeground(Color.white);
+			    		  setBackground(Color.orange);
+//			    		  setForeground(Color.white);
 			    	  }
 			      }
                   return c;
@@ -288,6 +291,7 @@ public class Explorator {
 			}
 		}
 		dataTable.refreshTable(workOrderWBList);
+		setViewOptionsDefault();
 	}
 	
 	/**
@@ -296,6 +300,7 @@ public class Explorator {
 	public void removeAllWorkOrders() {
 		workOrderWBList.clear();
 		dataTable.refreshTable(workOrderWBList);
+		setViewOptionsDefault();
 	}
 	
 	/**
@@ -329,14 +334,32 @@ public class Explorator {
 							contentPane.add(dataTable.getTable());
 							firstAdd = true;
 						}
-						workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, mult.intValue()));
-						dataTable.refreshTable(workOrderWBList);
+						WorkOrderWorkbook WO = new WorkOrderWorkbook(workOrderPath, mult.intValue());
+						if(WO.createWB()) {
+							workOrderWBList.add(WO);
+							dataTable.refreshTable(workOrderWBList);
+							setViewOptionsDefault();
+						}
+//						workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, mult.intValue()));
+//						dataTable.refreshTable(workOrderWBList);
 					}
 				}catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Set the current selection of the view options button group to "Show All"
+	 */
+	public void setViewOptionsDefault() {
+		ButtonGroup bg = menu.getButtonGroup();
+		for(Enumeration<AbstractButton> e = bg.getElements(); e.hasMoreElements();) {
+			AbstractButton btn = e.nextElement();
+			if(btn.getText().equals("Show All")) {btn.setSelected(true);}
+			else {btn.setSelected(false);}
+		}	
 	}
 	
 	/**

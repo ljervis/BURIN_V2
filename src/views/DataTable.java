@@ -196,13 +196,17 @@ public class DataTable {
 		}
 	}
 	
+	public DefaultTableModel getTableModel() {
+		return tableModel;
+	}
+	
 	/**
 	 * Updates the inventory workbook with the current tables values. Negative quantities are shows as 0 in the workbook. 
 	 * Will only update if there are parts in the table model
 	 */
 	public void updateInventoryWorkbook() {
 		if(tableModel == null) {
-			JOptionPane.showMessageDialog(new JFrame(), "Please add a work order before updating the inventory work book", "Warning", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), "Please add a work order before updating the inventory work book!", "Warning", JOptionPane.WARNING_MESSAGE);
 		}
 		else {
 			ArrayList<Pair> inventoryUpdates = new ArrayList<Pair>();

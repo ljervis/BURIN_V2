@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -48,8 +51,18 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		multiplier = mult;
 		workbookName = file.substring(file.lastIndexOf("\\")+1, file.lastIndexOf("."));
 		setSheet(0);
-		if(!isValid()) {System.out.println("InvalidWB");}
-		else {read();}
+	}
+	
+	public boolean createWB() {
+		if(!isValid()) {
+			System.out.println("InvalidWB");
+			JOptionPane.showMessageDialog(new JFrame(), "Invalid work order detected. Please make sure the work order is closed, contains the words \"work order\" in cell A1, and contains cells with the words \"START\" and \"END\" above and below the part numbers", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		else {
+			read();
+			return true; 
+		}
 	}
 	
 	/**
@@ -74,8 +87,10 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	public boolean checkHeader() {
 		
 		Row row = sheet.getRow(0);
-		Cell cell = row.getCell(0);
-		if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(WOH)) {return true;}
+		if(row != null) {
+			Cell cell = row.getCell(0);
+			if(checkStringCellValid(cell) && cell.getStringCellValue().trim().equalsIgnoreCase(WOH)) {return true;}
+		}
 		return false;
 	}
 	
@@ -190,13 +205,15 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		
 		for(int x = partStartRow+1; x < partEndRow; x++) {
 			Row row = sheet.getRow(x);
-			Cell partNumCell = row.getCell(0);
-			Cell qtyCell = row.getCell(1);
-			
-			if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {
-				Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
-				Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
-				partList.put(partNumValue, qtyValue * multiplier);
+			if(row != null) {
+				Cell partNumCell = row.getCell(0);
+				Cell qtyCell = row.getCell(1);
+				
+				if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {
+					Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
+					Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
+					partList.put(partNumValue, qtyValue * multiplier);
+				}
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -16,6 +17,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.border.EtchedBorder;
 
+import rootPackage.WorkOrderWorkbook;
+
 public class MenuBar {
 	
 	// Swing Components
@@ -25,9 +28,11 @@ public class MenuBar {
 	private JMenu seperator;
 	private ButtonGroup viewBtnGroup;
 	
+	ArrayList<WorkOrderWorkbook> workOrderWBList;
 	DataTable table;
 	
-	public MenuBar(DataTable table) {
+	public MenuBar(DataTable table, ArrayList<WorkOrderWorkbook> list) {
+		workOrderWBList = list;
 		this.table = table;
 		setUpMenu();
 	}
@@ -91,7 +96,17 @@ public class MenuBar {
         invUpdateBtn.setFont(new Font("Serif", Font.PLAIN, 18));
         
         reportBtn.addActionListener((ActionEvent e) -> {
-        	
+        	if(workOrderWBList == null || workOrderWBList.isEmpty() == true) {
+        		JOptionPane.showMessageDialog(new JFrame(), "Please add a work order to the table before creating a report!", "Error", JOptionPane.ERROR_MESSAGE);
+        	}
+        	else {
+	        	int choice = JOptionPane.showConfirmDialog(new JFrame(),
+	        			"An excel file containing \"Pick List\" and \"Shortage List\" sheets will be created based on "
+	        			+ "the work orders added to the table, do you want to proceed?", "Warning", JOptionPane.YES_NO_OPTION);
+	        	if(choice == 0) {
+	        		createReport();
+	        	}
+        	}
         });
         
         invUpdateBtn.addActionListener((ActionEvent e) -> {
@@ -113,8 +128,16 @@ public class MenuBar {
 		
 	}
 	
+	public void createReport() {
+		
+	}
+	
 	public JMenuBar getMenu() {
 		return menuBar;
+	}
+	
+	public ButtonGroup getButtonGroup() {
+		return viewBtnGroup;
 	}
 
 }
