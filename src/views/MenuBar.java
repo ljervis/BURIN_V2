@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -17,7 +18,11 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.border.EtchedBorder;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import rootPackage.WorkOrderWorkbook;
+import rootPackage.OrderStock;
 
 public class MenuBar {
 	
@@ -129,7 +134,16 @@ public class MenuBar {
 	}
 	
 	public void createReport() {
-		
+		Workbook reportWB = new XSSFWorkbook();
+		OrderStock pickList = new OrderStock(workOrderWBList, table, reportWB);
+		pickList.createList();
+		try {
+			FileOutputStream fileout = new FileOutputStream("ReportTest.xlsx");
+			reportWB.write(fileout);
+		}catch (Exception e) {
+			JOptionPane.showMessageDialog(new JFrame(), "There was an error writing the report to the file", "Error", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
 	}
 	
 	public JMenuBar getMenu() {
