@@ -139,6 +139,7 @@ public class MenuBar {
 		OrderStock pickList = new OrderStock(table, reportWB);
 		InStock shortageList = new InStock(table, reportWB, workOrderWBList);
 		pickList.createList();
+		shortageList.createList();
 		try {
 			FileOutputStream fileout = new FileOutputStream("ReportTest.xlsx");
 			reportWB.write(fileout);

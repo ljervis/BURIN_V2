@@ -21,7 +21,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	
 	Workbook workbook;
 	Sheet sheet;
-	HashMap<Integer,Integer> partList;
+	HashMap<Integer,Pair> partList;
 	int partStartRow;
 	int partEndRow;
 	int multiplier;
@@ -154,12 +154,12 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	public void printPartList() {
 		for(Integer key : partList.keySet()) {
 			String part = key.toString();
-			String qty = partList.get(key).toString();
+			String qty = partList.get(key).first.toString();
 			System.out.println(part + " " + qty);
 		}
 	}
 	
-	public HashMap<Integer, Integer> getPartList() {return partList;}
+	public HashMap<Integer, Pair> getPartList() {return partList;}
 	
 	/*
 	 * Set the multiplier of this workbook
@@ -201,9 +201,9 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	@Override
 	public void read() {
 		
-		partList = new HashMap<Integer, Integer>();
+		partList = new HashMap<Integer, Pair>();
 		
-		for(int x = partStartRow+1; x < partEndRow; x++) {
+		for(int x = partStartRow+2; x < partEndRow; x++) {
 			Row row = sheet.getRow(x);
 			if(row != null) {
 				Cell partNumCell = row.getCell(0);
@@ -212,18 +212,19 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 				if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {
 					Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
 					Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
-					partList.put(partNumValue, qtyValue * multiplier);
+					Integer rowValue = new Integer(row.getRowNum());
+					partList.put(partNumValue, new Pair(qtyValue * multiplier, rowValue));
 				}
 			}
 		}
 	}
 	
-	public void getHeader() {
-		
+	public Sheet getSheet() {
+		return sheet;
 	}
 	
-	public void getInfo(int partNum) {
-		
+	public int getPartStartRow() {
+		return partStartRow;
 	}
 
 }

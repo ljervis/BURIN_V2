@@ -137,10 +137,10 @@ public class DataTable {
 			int totalQtyNeeded = 0;
 					
 			for(WorkOrderWorkbook n : workOrderWBList) {
-				Integer part = n.getPartList().get(i);
+				Pair part = n.getPartList().get(i);
 				if(part != null) { 
-					row.add(part);	// Add the number of parts needed for each work order from their hash maps 
-					totalQtyNeeded += part.intValue();
+					row.add(part.first);	// Add the number of parts needed for each work order from their hash maps 
+					totalQtyNeeded += part.first.intValue();
 				}
 				else { row.add(new Integer(0)); }	// Add 0 parts if the workbooks hash map does not contain the part number 
 			}
