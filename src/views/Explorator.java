@@ -109,10 +109,10 @@ public class Explorator {
 		dataTable = new DataTable(invWB);
 		contentPane.add(textLabel);
 		firstAdd = false;
-//		contentPane.add(dataTable.getTable());
 		menu = new MenuBar(dataTable, workOrderWBList);
 		exploratorFrame.setJMenuBar(menu.getMenu());
 		exploratorFrame.setContentPane(contentPane);
+		
 	}
 	
 	/**

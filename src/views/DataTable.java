@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.SystemColor;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
@@ -64,6 +66,10 @@ public class DataTable {
 		return tableScrollPane;
 	}
 	
+	public JTable getJTable() {
+		return table;
+	}
+	
 	/**
 	 * This is executed each time a work order is added or removed from the work order list. 
 	 * Scans all the work orders in the work order list for parts to display and populates the table by comparing quantities with the inventory work book
@@ -107,6 +113,7 @@ public class DataTable {
 		renderer = new CustomTableCellRenderer();
 		table.setDefaultRenderer(Integer.class, renderer);
 		table.setRowSorter(sorter);
+		
 	}
 	
 	/**

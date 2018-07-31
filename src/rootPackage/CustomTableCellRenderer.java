@@ -2,6 +2,7 @@ package rootPackage;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.SystemColor;
 import java.util.Arrays;
 
 import javax.swing.JTable;
@@ -18,7 +19,6 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	public CustomTableCellRenderer() {
 		super();
 		setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-		permCols = new String[] {partCol, inStockCol, totalCol, remainingCol}; 
 	}
 	
 	@Override
@@ -38,6 +38,9 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	 				cell.setBackground(Color.lightGray);
 	 			}
 	 		}
+	        if(isSelected) {
+	        	cell.setBackground(SystemColor.inactiveCaption);
+	        }
 	    }
 		return cell;
 	}
