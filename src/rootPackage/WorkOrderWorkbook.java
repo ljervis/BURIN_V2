@@ -217,5 +217,13 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 			}
 		}
 	}
+	
+	public void getHeader() {
+		
+	}
+	
+	public void getInfo(int partNum) {
+		
+	}
 
 }
