@@ -31,6 +31,9 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	final String WOH = "work order";
 	final String WOS = "start";
 	final String WOE = "end";
+	final int mfgPartCol = 4;
+	final int partDescriptionCol = 5;
+	final int partSupplierCol = 7;
 	
 	/*
 	 *  Open workbook with OPCPackage 
@@ -217,6 +220,49 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 				}
 			}
 		}
+	}
+	
+	public String getMFGPart(Integer part) {
+		String mfgPart = "";
+		Pair partInfo = partList.get(part);
+		if(partInfo != null) {
+			int rowNum = partInfo.second.intValue();
+			Row row = sheet.getRow(rowNum);
+			Cell cell = row.getCell(mfgPartCol);
+			if(checkStringCellValid(cell)) {
+				mfgPart = cell.getStringCellValue();
+			}
+		}
+		return mfgPart;
+	}
+	
+	public String getDescription(Integer part) {
+		String description = "";
+		Pair partInfo = partList.get(part);
+		if(partInfo != null) {
+			int rowNum = partInfo.second.intValue();
+			Row row = sheet.getRow(rowNum);
+			Cell cell = row.getCell(partDescriptionCol);
+			if(checkStringCellValid(cell)) {
+				description = cell.getStringCellValue();
+			}
+		}
+		return description;
+	}
+	
+	
+	public String getSupplier(Integer part) {
+		String supplier = "";
+		Pair partInfo = partList.get(part);
+		if(partInfo != null) {
+			int rowNum = partInfo.second.intValue();
+			Row row = sheet.getRow(rowNum);
+			Cell cell = row.getCell(partSupplierCol);
+			if(checkStringCellValid(cell)) {
+				supplier = cell.getStringCellValue();
+			}
+		}
+		return supplier;
 	}
 	
 	public Sheet getSheet() {

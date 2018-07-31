@@ -46,6 +46,8 @@ public class OrderStock implements Stock {
 	    font.setBold(true);
 	    
 	    CellStyle style = workbook.createCellStyle();
+	    style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+	    style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
 	    style.setFont(font);
 
 	    
