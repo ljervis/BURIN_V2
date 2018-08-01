@@ -50,6 +50,7 @@ public class ShortageSheet implements Stock {
 	 * @param list A list of all work order workbook objects currently loaded onto the table
 	 */
 	public ShortageSheet(DataTable table, Workbook wb, ArrayList<WorkOrderWorkbook> list) {
+		
 		tableModel = table.getTableModel();
 		tableData = tableModel.getDataVector();
 		workbook = wb; 

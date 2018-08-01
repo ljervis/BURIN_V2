@@ -2,32 +2,38 @@ package rootPackage;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+/**
+ * @author Luke <a href="mailto:lukejervis14@gmail.com">lukejervis14@gmail.com</a>
+ *
+ */
 public class WorkOrderWorkbook implements WorkbookInterface {
 	
-	Workbook workbook;
-	Sheet sheet;
-	HashMap<Integer,Pair> partList;
-	int partStartRow;
-	int partEndRow;
-	int multiplier;
-	String workbookName;
+	/**
+	 * Private fields used in this class
+	 */
+	private Workbook workbook;
+	private Sheet sheet;
+	private HashMap<Integer,Pair> partList;
+	private int partStartRow;
+	private int partEndRow;
+	private int multiplier;
+	private String workbookName;
 	
-	// Constants for validating the work order
+	/**
+	 * Final field used in this class
+	 */
 	final String WOH = "work order";
 	final String WOS = "start";
 	final String WOE = "end";
@@ -35,17 +41,13 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	final int partDescriptionCol = 5;
 	final int partSupplierCol = 7;
 	
-	/*
-	 *  Open workbook with OPCPackage 
-	 */
-	public WorkOrderWorkbook(OPCPackage pgk) throws Exception {
-		
-		workbook = new XSSFWorkbook(pgk);
-		multiplier = 1;
-	}
-	
-	/*
-	 *  Open workbook with workbook factory 
+	/**
+	 * Creates an object to control the life cycle and data contained in a
+	 * work order workbook excel file. Initializes most private variables
+	 * @param file	The file name of the inventory workbook 
+	 * @param mult The number of work orders, used to calculate parts needed
+	 * @throws Exception Creation of the workbook with the workbook factory can 
+	 * throw IOException, InvalidFormatException, or EncryptedDocumentException
 	 */
 	public WorkOrderWorkbook(String file, int mult) throws Exception {
 		
@@ -56,10 +58,18 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		setSheet(0);
 	}
 	
+	/**
+	 * Checks to see if the work order file is valid. Reads the work order if valid and 
+	 * displays an error message if invalid.
+	 * @return true if the work order is valid, false otherwise 
+	 */
 	public boolean createWB() {
 		if(!isValid()) {
 			System.out.println("InvalidWB");
-			JOptionPane.showMessageDialog(new JFrame(), "Invalid work order detected. Please make sure the work order is closed, contains the words \"work order\" in cell A1, and contains cells with the words \"START\" and \"END\" above and below the part numbers", "Error", JOptionPane.ERROR_MESSAGE);
+			errorMessage("Invalid work order detected. Please make sure the work "
+					+ "order is closed, contains the words \"work order\" in cell A1, "
+					+ "and contains cells with the words \"START\" and \"END\" above"
+					+ " and below the part numbers");
 			return false;
 		}
 		else {
@@ -69,7 +79,15 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	}
 	
 	/**
-	 * 
+	 * Displays an error message to the user with the given message 
+	 * @param message The error message to display 
+	 */
+	public void errorMessage(String message) {
+		JOptionPane.showMessageDialog(new JFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	/**
+	 * Getter method for the work order workbook file name
 	 * @return the name of the workbook with its file extension removed
 	 */
 	public String getWorkbookName() {
@@ -77,15 +95,16 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	}
 	
 	/**
-	 * 
+	 * Getter for the number of work orders used in calculating the parts needed
 	 * @return the multiplicity or the number of workbooks processed
 	 */
 	public int getMultiplicity() {
 		return multiplier;
 	}
 	
-	/*
-	 *  Check to see if the words "work order" is in cell A1
+	/**
+	 * One of the work order validation methods. Checks to see if the words "work order" is in cell A1
+	 * @return true if the work is present, false otherwise 
 	 */
 	public boolean checkHeader() {
 		
@@ -97,9 +116,10 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return false;
 	}
 	
-	/* 
-	 * Check to see if the word "part#" is in column A and return the row index or -1 if not present
+	/**
+	 * One of the work order validation methods. Checks to see if the word "START" is in column A.
 	 * Assumption that checkHeader() returned true
+	 * @return The row number if the word is present, -1 otherwise 
 	 */
 	
 	public int checkStart() {
@@ -111,9 +131,10 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return -1;
 	}
 	
-	/*
-	 * Check to see if the word "floor stock" is in column A and return the row index or -1 if not present
-	 * Assumption that isValid() returned true
+	/**
+	 * One of the work order validation methods. Checks to see if the word "END" is in column A.
+	 * Assumption that isValid() returned true.
+	 * @return The row number if the word is present, -1 otherwise.
 	 */
 	public int checkEnd() {
 		
@@ -124,9 +145,10 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return -1;
 	}
 	
-	/*
-	 * Return true if parts above floor stock, false otherwise
-	 * Assumption that partStartRow and partEndRow have been initialized
+	/**
+	 * Check whether the row containing the END row is after the START row
+	 * Assumption that partStartRow and partEndRow have been initialized.
+	 * @return True if END is above START, false otherwise
 	 */
 	public boolean checkRowsValid() {
 		if(partEndRow > partStartRow) {return true;}
@@ -198,8 +220,9 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return true;
 	}
 
-	/*
-	 * Parse the work order sheet and populate the part list
+	/**
+	 * Parses the work order sheet and populates the part list with these values.
+	 * Quantities are multiplied by the multiplier to simulate multiple work orders.
 	 */
 	@Override
 	public void read() {
@@ -222,13 +245,19 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		}
 	}
 	
+	/**
+	 * If the given part is present in the part list, the row containing that part is used
+	 * to retrieve the "MFG PART NUMBER" from the original work order workbook
+	 * @param part The part used for lookup 
+	 * @return The "MFG PART NUMBER" if present, an empty string otherwise
+	 */
 	public String getMFGPart(Integer part) {
 		String mfgPart = "";
 		Pair partInfo = partList.get(part);
 		if(partInfo != null) {
 			int rowNum = partInfo.second.intValue();
 			Row row = sheet.getRow(rowNum);
-			Cell cell = row.getCell(mfgPartCol);
+			Cell cell = row.getCell(mfgPartCol);	// Uses mfgPartCol final variable as the column containing this field
 			if(checkStringCellValid(cell)) {
 				mfgPart = cell.getStringCellValue();
 			}
@@ -236,13 +265,19 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return mfgPart;
 	}
 	
+	/**
+	 * If the given part is present in the part list, the row containing that part is used
+	 * to retrieve the "DESCRIPTION" from the original work order workbook
+	 * @param part The part used for lookup 
+	 * @return The "DESCRIPTION" if present, an empty string otherwise
+	 */
 	public String getDescription(Integer part) {
 		String description = "";
 		Pair partInfo = partList.get(part);
 		if(partInfo != null) {
 			int rowNum = partInfo.second.intValue();
 			Row row = sheet.getRow(rowNum);
-			Cell cell = row.getCell(partDescriptionCol);
+			Cell cell = row.getCell(partDescriptionCol);	// Uses partDescriptionCol final variable as the column containing this field
 			if(checkStringCellValid(cell)) {
 				description = cell.getStringCellValue();
 			}
@@ -250,14 +285,19 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return description;
 	}
 	
-	
+	/**
+	 * If the given part is present in the part list, the row containing that part is used
+	 * to retrieve the "SUPPLIER" from the original work order workbook.
+	 * @param part The part used for lookup 
+	 * @return The "SUPPLIER" if present, an empty string otherwise
+	 */
 	public String getSupplier(Integer part) {
 		String supplier = "";
 		Pair partInfo = partList.get(part);
 		if(partInfo != null) {
 			int rowNum = partInfo.second.intValue();
 			Row row = sheet.getRow(rowNum);
-			Cell cell = row.getCell(partSupplierCol);
+			Cell cell = row.getCell(partSupplierCol);	// Uses partSupplierCol final variable as the column containing this field
 			if(checkStringCellValid(cell)) {
 				supplier = cell.getStringCellValue();
 			}
@@ -265,10 +305,18 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		return supplier;
 	}
 	
+	/**
+	 * Getter method for the Sheet
+	 * @return The Sheet object
+	 */
 	public Sheet getSheet() {
 		return sheet;
 	}
 	
+	/**
+	 * Getter method for the part number starting Row 
+	 * @return The row number 
+	 */
 	public int getPartStartRow() {
 		return partStartRow;
 	}
