@@ -206,7 +206,7 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 		
 		partList = new HashMap<Integer, Pair>();
 		
-		for(int x = partStartRow+2; x < partEndRow; x++) {
+		for(int x = partStartRow+1; x < partEndRow; x++) {
 			Row row = sheet.getRow(x);
 			if(row != null) {
 				Cell partNumCell = row.getCell(0);

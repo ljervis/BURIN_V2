@@ -22,7 +22,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import rootPackage.WorkOrderWorkbook;
-import rootPackage.InStock;
+import rootPackage.ShortageSheet;
 import rootPackage.OrderStock;
 
 public class MenuBar {
@@ -137,7 +137,7 @@ public class MenuBar {
 	public void createReport() {
 		Workbook reportWB = new XSSFWorkbook();
 		OrderStock pickList = new OrderStock(table, reportWB);
-		InStock shortageList = new InStock(table, reportWB, workOrderWBList);
+		ShortageSheet shortageList = new ShortageSheet(table, reportWB, workOrderWBList);
 		pickList.createList();
 		shortageList.createList();
 		try {
