@@ -3,7 +3,9 @@ package views;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -20,6 +22,8 @@ import javax.swing.border.EtchedBorder;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.sun.corba.se.pept.encoding.InputObject;
+
 import rootPackage.WorkOrderWorkbook;
 import rootPackage.ShortageSheet;
 import rootPackage.OrderStock;
@@ -35,6 +39,8 @@ public class MenuBar {
 	
 	ArrayList<WorkOrderWorkbook> workOrderWBList;
 	DataTable table;
+	
+	private final String REPORTLOC = "Reports";
 	
 	public MenuBar(DataTable table, ArrayList<WorkOrderWorkbook> list) {
 		workOrderWBList = list;
@@ -146,7 +152,7 @@ public class MenuBar {
 			    table.updateInventoryWorkbook(fileName);
 			}
 		}
-		else {
+		else if (n == 0) {
 			table.updateInventoryWorkbook();
 		}
 	}
@@ -156,8 +162,7 @@ public class MenuBar {
     			+ "the work orders added to the table, Enter a name for\n the report and press OK to continue.", "Warning", JOptionPane.PLAIN_MESSAGE, null, null, null);
 		if(fileName != null && (!"".equals(fileName)))   
 		{
-		    createReport(fileName);
-		    JOptionPane.showMessageDialog(new JFrame(), "Report Created!");
+			createReport(REPORTLOC + "//" + fileName);
 		}
 	}
 	
@@ -168,10 +173,12 @@ public class MenuBar {
 		pickList.createList();
 		shortageList.createList();
 		try {
-			FileOutputStream fileout = new FileOutputStream(fileName + ".xlsx");
-			reportWB.write(fileout);
-		}catch (Exception e) {
-			JOptionPane.showMessageDialog(new JFrame(), "There was an error writing the report to the file", "Error", JOptionPane.ERROR_MESSAGE);
+			FileOutputStream fileOut = new FileOutputStream(fileName + ".xlsx");
+			reportWB.write(fileOut);
+			JOptionPane.showMessageDialog(new JFrame(), "Report Created!");
+		}catch(Exception e) {
+			JOptionPane.showMessageDialog(new JFrame(), "There was an error writing the report to the file\n"
+					+ "Please make sure the Reports folder exists and try again!", "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}

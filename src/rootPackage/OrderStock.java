@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -76,6 +77,7 @@ public class OrderStock implements Stock {
 		CellStyle headerRowStyle = workbook.createCellStyle();	
 		headerRowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		headerRowStyle.setFillForegroundColor(color);
+		headerRowStyle.setAlignment(HorizontalAlignment.CENTER);
 		
 		Font font = workbook.createFont();
 	    font.setFontHeightInPoints((short)size);
@@ -114,11 +116,14 @@ public class OrderStock implements Stock {
 		Row headerRow = pickList.createRow(rowCount);
 		rowCount++;
 		CellStyle headerRowStyle = createCellStyle(18, IndexedColors.GREY_25_PERCENT.getIndex(), true);
+		addBorder(headerRowStyle);
 		pickList.createFreezePane(0, 1, 0, 1);
+		int quantityRemainingRow = tableModel.getColumnCount()-1;	// New
 		for(int col = 0; col < tableModel.getColumnCount()-1; col++) {
 			createCell(headerRow, col, tableModel.getColumnName(col), headerRowStyle);
 		}
 		createCell(headerRow, tableModel.getColumnCount()-1, QTY, headerRowStyle);
+		createCell(headerRow, tableModel.getColumnCount(), tableModel.getColumnName(quantityRemainingRow), headerRowStyle); // New
 	}
 	
 	
@@ -127,7 +132,7 @@ public class OrderStock implements Stock {
 	 */
 	public void createPickList() {
 		
-		CellStyle greyStyle = createCellStyle(11, IndexedColors.GREY_40_PERCENT.getIndex(), false);
+		CellStyle greyStyle = createCellStyle(11, IndexedColors.GREY_25_PERCENT.getIndex(), false);
 		CellStyle deficitStyle = createCellStyle(11, IndexedColors.YELLOW.getIndex(), false);
 		CellStyle borderStyle = createCellStyle(11, IndexedColors.WHITE.getIndex(), false);
 		addBorder(greyStyle);
@@ -144,10 +149,12 @@ public class OrderStock implements Stock {
 					createCell(dataRow, cellCount, i, greyStyle);
 				}
 				else if(cellCount == v.size()-1) {
-					int cellVal = i.intValue() >= 0 ? i.intValue() : 0;
+					int cellVal = i.intValue() >= 0 ? i.intValue() : 0;	// This is the quantity remaining column on the table 
 					int invQty = v.get(1);	// The inventory quantity should always be in column 1
 					CellStyle style = i.intValue() < 0 ? deficitStyle : borderStyle;
-					createCell(dataRow, cellCount, new Integer(invQty - cellVal), style);
+					createCell(dataRow, cellCount, new Integer(invQty - cellVal), style);	// This is the quantity to be taken out of inventory
+					cellCount++;
+					createCell(dataRow, cellCount, cellVal, borderStyle); // This is the quantity remaining in inventory
 				}
 				else {
 					createCell(dataRow, cellCount, i, borderStyle);
@@ -162,7 +169,7 @@ public class OrderStock implements Stock {
 	 * Should be called after the sheet has been completely populated. 
 	 */
 	public void autoSizeColumns() {
-		for(int i = 0; i < tableModel.getColumnCount(); i++) {
+		for(int i = 0; i < tableModel.getColumnCount()+1; i++) {
 			pickList.autoSizeColumn(i); 
 		}
 	}

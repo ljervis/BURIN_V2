@@ -61,8 +61,6 @@ public class InventoryWorkbook implements WorkbookInterface {
 //		File inp = new File(file);
 		workbook = WorkbookFactory.create(inp);
 		updateMessage = "";
-		
-		System.out.println(file);
 	}
 	
 	/**

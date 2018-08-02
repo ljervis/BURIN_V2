@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -56,7 +57,7 @@ public class ShortageSheet implements Stock {
 		workbook = wb; 
 		workOrderWBList = list;
 		rowCount = 0;
-		headerColumnNames = new String[] {SHORT, MFG, DES, SUP};
+		headerColumnNames = new String[] {SHORT, MFG, DES};	// Supplier is not currently added to the shortage sheet
 	}
 	
 	/**
@@ -92,6 +93,7 @@ public class ShortageSheet implements Stock {
 		CellStyle headerRowStyle = workbook.createCellStyle();	
 		headerRowStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		headerRowStyle.setFillForegroundColor(color);
+		headerRowStyle.setAlignment(HorizontalAlignment.CENTER);
 		
 		Font font = workbook.createFont();
 	    font.setFontHeightInPoints((short)size);
@@ -128,6 +130,7 @@ public class ShortageSheet implements Stock {
 		Row headerRow = shortageSheet.createRow(rowCount);
 		rowCount++;
 		CellStyle headerRowStyle = createCellStyle(16, IndexedColors.GREY_25_PERCENT.getIndex(), true);
+		addBorder(headerRowStyle);
 		//	The header will use all but the last column header names from the table 
 		for(int col = 0; col < tableModel.getColumnCount()-1; col++) {
 			createCell(headerRow, col, tableModel.getColumnName(col), headerRowStyle);
@@ -145,7 +148,7 @@ public class ShortageSheet implements Stock {
 	 */
 	public void createShortageList() {
 		
-		CellStyle greyStyle = createCellStyle(11, IndexedColors.GREY_40_PERCENT.getIndex(), false);
+		CellStyle greyStyle = createCellStyle(11, IndexedColors.GREY_25_PERCENT.getIndex(), false);
 		CellStyle deficitStyle = createCellStyle(11, IndexedColors.YELLOW.getIndex(), false);
 		CellStyle borderStyle = createCellStyle(11, IndexedColors.WHITE.getIndex(), false);
 		addBorder(greyStyle);
@@ -197,7 +200,7 @@ public class ShortageSheet implements Stock {
 		case DES : 
 			while(text.equals("") && iter.hasNext()) { text = iter.next().getDescription(part); }
 		case SUP :
-			while(text.equals("") && iter.hasNext()) { text = iter.next().getSupplier(part); }
+//			while(text.equals("") && iter.hasNext()) { text = iter.next().getSupplier(part); }
 		}
 		return text;
 	}
