@@ -1,12 +1,12 @@
 package views;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -19,7 +19,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 
 import rootPackage.InventoryWorkbook;
@@ -41,7 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Dimension;
 import java.awt.SystemColor;
-import javax.swing.UIManager;
+import java.awt.Toolkit;
 
 public class Explorator {
 
@@ -76,7 +75,7 @@ public class Explorator {
 		mHoverIndex = -1;
 		
 		// This will need to be changed to the permanent work order folder before shipping 
-		workOrderDirectory = "C:\\Users\\luke\\eclipse-workspace\\BURIN_V2\\src\\Files\\WorkOrders";
+		workOrderDirectory = "WorkOrders";
 		
 		invWB = wb;
 		workOrderWBList = new ArrayList<WorkOrderWorkbook>();
@@ -98,12 +97,17 @@ public class Explorator {
 		exploratorFrame.setBounds(100, 100, 1000, 1000);
 		exploratorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		URL logoUrl = WelcomeWindow.class.getResource("/resources/BurinIcon.png");
+		exploratorFrame.setIconImage(new ImageIcon(logoUrl).getImage());
+		
+		
 		if (!getWorkOrders(workOrderDirectory)) { 
 			errorMessage("No work orders found in *** folder. Please add the work orders you would like to process and restart the program");
 			System.exit(0);
 		}
 		
-		textLabel = new JLabel(new ImageIcon("src/images/ExplorerIcon.png"));
+		URL url = WelcomeWindow.class.getResource("/resources/ExplorerIcon.png");
+		textLabel = new JLabel(new ImageIcon(url));
 		
 		populateWorkOrderList();
 		dataTable = new DataTable(invWB);
@@ -315,8 +319,8 @@ public class Explorator {
 			if(f.getName().equals(workOrderName + ".xlsx")) {
 				try {
 					
-					Integer[] range = new Integer[20];
-					for(int i = 0; i < 20; i++) {
+					Integer[] range = new Integer[50];
+					for(int i = 0; i < 50; i++) {
 						range[i] = new Integer(i+1);
 					}
 					
@@ -326,7 +330,7 @@ public class Explorator {
 							"Work Order Selection", JOptionPane.PLAIN_MESSAGE, null, range, range[0]);
 					
 					// This will need to be changed in the future to reflect the permanent location
-					String workOrderPath = ".\\src\\Files\\WorkOrders\\"+ workOrderName + ".xlsx";
+					String workOrderPath = "WorkOrders\\"+ workOrderName + ".xlsx";
 					if(mult != null) {
 						if(!firstAdd) {
 							contentPane.remove(textLabel);
@@ -340,8 +344,6 @@ public class Explorator {
 							dataTable.refreshTable(workOrderWBList);
 							setViewOptionsDefault();
 						}
-//						workOrderWBList.add(new WorkOrderWorkbook(workOrderPath, mult.intValue()));
-//						dataTable.refreshTable(workOrderWBList);
 					}
 				}catch(Exception e) {
 					e.printStackTrace();

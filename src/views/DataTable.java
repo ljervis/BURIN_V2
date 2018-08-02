@@ -210,6 +210,34 @@ public class DataTable {
 	/**
 	 * Updates the inventory workbook with the current tables values. Negative quantities are shows as 0 in the workbook. 
 	 * Will only update if there are parts in the table model
+	 * 
+	 * @param fileName The file name for the new inventory workbook file
+	 */
+	public void updateInventoryWorkbook(String fileName) {
+		if(tableModel == null) {
+			JOptionPane.showMessageDialog(new JFrame(), "Please add a work order before updating the inventory work book!", "Warning", JOptionPane.WARNING_MESSAGE);
+		}
+		else {
+			ArrayList<Pair> inventoryUpdates = new ArrayList<Pair>();
+			int rowCount = tableModel.getRowCount();
+			int colCount = tableModel.getColumnCount();
+			for(int x = 0; x < rowCount; x++) {
+				Integer part = (Integer)tableModel.getValueAt(x, 0);
+				Integer qty = (Integer)tableModel.getValueAt(x, colCount-1);
+				Integer qtyAdj = qty.intValue() >= 0 ? qty : new Integer(0);	// If the qty is negative then add a 0 
+				Pair i = new Pair(part, qtyAdj);
+				inventoryUpdates.add(i);
+			}
+			
+			if(inventoryUpdates.size() > 0) {
+				invWB.updateInventoryWorkbook(inventoryUpdates, fileName);
+			}
+		}
+	}
+	
+	/**
+	 * Updates the inventory workbook with the current tables values. Negative quantities are shows as 0 in the workbook. 
+	 * Will only update if there are parts in the table model
 	 */
 	public void updateInventoryWorkbook() {
 		if(tableModel == null) {

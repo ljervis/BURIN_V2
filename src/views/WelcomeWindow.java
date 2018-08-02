@@ -7,6 +7,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import javax.swing.Box;
@@ -61,15 +62,19 @@ public class WelcomeWindow {
 		
 		windowFrame = new JFrame();
 		windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		windowFrame.setTitle("Burin - Inventory Workbook Selection");
+		windowFrame.setTitle("Burin - Inventory Selector");
 		windowFrame.setBounds(300, 300, 500, 500);
+		
+		URL logoUrl = WelcomeWindow.class.getResource("/resources/BurinIcon.png");
+		windowFrame.setIconImage(new ImageIcon(logoUrl).getImage());
 		
 		contentPane = new JPanel();
 		contentPane.setBackground(SystemColor.inactiveCaption);
 		contentPane.setLayout(new BoxLayout(contentPane,BoxLayout.X_AXIS));
 		contentPane.setTransferHandler(new FileDropHandler());
 		
-		textLabel = new JLabel(new ImageIcon("src/images/WelcomeScreenImage.png"));
+		URL url = WelcomeWindow.class.getResource("/resources/WelcomeScreenImage.png");
+		textLabel = new JLabel(new ImageIcon(url));
 		textLabel.setHorizontalTextPosition(JLabel.CENTER);
 		textLabel.setVerticalTextPosition(JLabel.TOP);
 		
@@ -101,7 +106,7 @@ public class WelcomeWindow {
 		}catch(Exception e) {
 			e.printStackTrace();
 			errorMessage("A problem occured when trying to open the inventory work book. Please make sure the file is closed and restart the program.");
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
