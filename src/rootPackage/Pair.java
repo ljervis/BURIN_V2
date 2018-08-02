@@ -11,6 +11,7 @@ public class Pair {
 	 */
 	public Integer first;
 	public Integer second;
+	public Integer third;
 	
 	/**
 	 * Creates a simple object to store and access two public Integers 
@@ -20,5 +21,17 @@ public class Pair {
 	public Pair(Integer f, Integer s) {
 		first = f;
 		second = s;
+	}
+	
+	/**
+	 * Creates a simple object to store and access two public Integers 
+	 * @param f The first Integer 
+	 * @param s The second Integer
+	 * @param t The third Integer
+	 */
+	public Pair(Integer f, Integer s, Integer t) {
+		first = f;
+		second = s;
+		third = t;
 	}
 }

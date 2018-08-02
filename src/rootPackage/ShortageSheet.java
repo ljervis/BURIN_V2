@@ -33,11 +33,12 @@ public class ShortageSheet implements Stock {
 	private Sheet shortageSheet;
 	private int rowCount;	// Counter to keep track of what row number is to be added next
 	private String[] headerColumnNames;
+	private InventoryWorkbook invWB; 
 	
 	/**
 	 * Final fields to be used in this class
 	 */
-	private final String SHORT = "Quantity Short";
+	private final String SHORT = "Quantity Short/Quantity Remaining";
 	private final String MFG = "MFG Part Number";
 	private final String DES = "Description";
 	private final String SUP = "Supplier";
@@ -50,7 +51,7 @@ public class ShortageSheet implements Stock {
 	 * @param wb The workbook in which the shortage list sheet will be created
 	 * @param list A list of all work order workbook objects currently loaded onto the table
 	 */
-	public ShortageSheet(DataTable table, Workbook wb, ArrayList<WorkOrderWorkbook> list) {
+	public ShortageSheet(DataTable table, Workbook wb, ArrayList<WorkOrderWorkbook> list, InventoryWorkbook invWB) {
 		
 		tableModel = table.getTableModel();
 		tableData = tableModel.getDataVector();
@@ -58,6 +59,7 @@ public class ShortageSheet implements Stock {
 		workOrderWBList = list;
 		rowCount = 0;
 		headerColumnNames = new String[] {SHORT, MFG, DES};	// Supplier is not currently added to the shortage sheet
+		this.invWB = invWB;
 	}
 	
 	/**
@@ -148,15 +150,18 @@ public class ShortageSheet implements Stock {
 	 */
 	public void createShortageList() {
 		
-		CellStyle greyStyle = createCellStyle(11, IndexedColors.GREY_25_PERCENT.getIndex(), false);
-		CellStyle deficitStyle = createCellStyle(11, IndexedColors.YELLOW.getIndex(), false);
-		CellStyle borderStyle = createCellStyle(11, IndexedColors.WHITE.getIndex(), false);
+		CellStyle greyStyle = createCellStyle(12, IndexedColors.GREY_25_PERCENT.getIndex(), false);
+		CellStyle deficitStyle = createCellStyle(12, IndexedColors.YELLOW.getIndex(), false);
+		CellStyle borderStyle = createCellStyle(12, IndexedColors.WHITE.getIndex(), false);
+		CellStyle minStyle = createCellStyle(12, IndexedColors.PINK1.getIndex(), false);
+		addBorder(minStyle);
 		addBorder(greyStyle);
 		addBorder(deficitStyle);
 		addBorder(borderStyle);
 		
 		for(Vector<Integer> v : tableData) {
 			int qtyRemaining = v.lastElement().intValue();
+			Integer partNumber = v.get(0);
 			//	Only look at rows with a deficit in the "remaining Qty" column 
 			if(qtyRemaining < 0) {
 				Row dataRow = shortageSheet.createRow(rowCount);
@@ -170,6 +175,28 @@ public class ShortageSheet implements Stock {
 					else {
 						Integer posative = i.intValue() >= 0 ? i : new Integer(i.intValue()*-1);
 						createCell(dataRow, cellCount, posative, borderStyle);
+					}
+					cellCount++;
+				}
+				
+				Integer partNum = v.get(0);	// the first element in the vector should be the part number 
+				for(int col = 0; col < headerColumnNames.length - 1; col++) {
+					int adjustedCol = col + cellCount;
+					createCell(dataRow, adjustedCol, getDescriptor(headerColumnNames[col + 1], partNum), borderStyle);
+				}
+			}
+			else if(invWB.checkBelowMin(partNumber, qtyRemaining)) {
+				Row dataRow = shortageSheet.createRow(rowCount);
+				rowCount++;
+				
+				int cellCount = 0;
+				for(Integer i : v) {
+					if(cellCount == v.size()-2) {
+						createCell(dataRow, cellCount, i, greyStyle);
+					}
+					else {
+						Integer posative = i.intValue() >= 0 ? i : new Integer(i.intValue()*-1);
+						createCell(dataRow, cellCount, posative, minStyle);
 					}
 					cellCount++;
 				}

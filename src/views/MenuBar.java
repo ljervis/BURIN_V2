@@ -26,6 +26,7 @@ import com.sun.corba.se.pept.encoding.InputObject;
 
 import rootPackage.WorkOrderWorkbook;
 import rootPackage.ShortageSheet;
+import rootPackage.InventoryWorkbook;
 import rootPackage.OrderStock;
 
 public class MenuBar {
@@ -39,12 +40,14 @@ public class MenuBar {
 	
 	ArrayList<WorkOrderWorkbook> workOrderWBList;
 	DataTable table;
+	InventoryWorkbook invWB;
 	
 	private final String REPORTLOC = "Reports";
 	
-	public MenuBar(DataTable table, ArrayList<WorkOrderWorkbook> list) {
+	public MenuBar(DataTable table, ArrayList<WorkOrderWorkbook> list, InventoryWorkbook wb) {
 		workOrderWBList = list;
 		this.table = table;
+		invWB = wb;
 		setUpMenu();
 	}
 	
@@ -168,8 +171,8 @@ public class MenuBar {
 	
 	public void createReport(String fileName) {
 		Workbook reportWB = new XSSFWorkbook();
-		OrderStock pickList = new OrderStock(table, reportWB);
-		ShortageSheet shortageList = new ShortageSheet(table, reportWB, workOrderWBList);
+		OrderStock pickList = new OrderStock(table, reportWB, invWB);
+		ShortageSheet shortageList = new ShortageSheet(table, reportWB, workOrderWBList, invWB);
 		pickList.createList();
 		shortageList.createList();
 		try {

@@ -110,7 +110,7 @@ public class DataTable {
 		tableHeader.setForeground(new Color(199, 21, 133));
 		
 		sorter = new TableRowSorter<TableModel>(tableModel);
-		renderer = new CustomTableCellRenderer();
+		renderer = new CustomTableCellRenderer(invWB);
 		table.setDefaultRenderer(Integer.class, renderer);
 		table.setRowSorter(sorter);
 		

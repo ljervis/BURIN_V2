@@ -299,13 +299,33 @@ public class InventoryWorkbook implements WorkbookInterface {
 			if(row.getRowNum() <= partNumStartRow) {continue;}
 			Cell partNumCell = row.getCell(0);
 			Cell qtyCell = row.getCell(1);
+			// New Stuff
+			Cell minCell = row.getCell(2);
 			
 			if(checkNumericCellValid(partNumCell) && checkNumericCellValid(qtyCell)) {
 				Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
 				Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
 				Integer rowValue = new Integer(row.getRowNum());
-				partList.put(partNumValue, new Pair(qtyValue, rowValue));
+				Integer minValue = new Integer(0);
+				if(checkNumericCellValid(minCell)) {
+					minValue = new Integer((int)minCell.getNumericCellValue());
+				}
+				partList.put(partNumValue, new Pair(qtyValue, rowValue, minValue));
 			}
 		}
+	}
+	
+	/**
+	 * Checks to see if the given quantity is below the minimum threshold for the part. 
+	 * @param part The part number 
+	 * @param qty The quantity we are checking 
+	 * @return True if the quantity is at or below the minimum, false otherwise
+	 */
+	public boolean checkBelowMin(Integer part, int qty) {
+		Integer minValue = partList.get(part).third;
+		if(qty <= minValue.intValue()) {
+			return true;
+		}
+		return false; 
 	}
 }

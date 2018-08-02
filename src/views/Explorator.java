@@ -113,7 +113,7 @@ public class Explorator {
 		dataTable = new DataTable(invWB);
 		contentPane.add(textLabel);
 		firstAdd = false;
-		menu = new MenuBar(dataTable, workOrderWBList);
+		menu = new MenuBar(dataTable, workOrderWBList, invWB);
 		exploratorFrame.setJMenuBar(menu.getMenu());
 		exploratorFrame.setContentPane(contentPane);
 		

@@ -18,11 +18,17 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	private static final long serialVersionUID = 1L;
 	
 	/**
+	 * Private fields used by this class
+	 */
+	private InventoryWorkbook workbook;
+	
+	/**
 	 * Creates a cell renderer to be used for table cell rendering. 
 	 * @see DataTable
 	 */
-	public CustomTableCellRenderer() {
+	public CustomTableCellRenderer(InventoryWorkbook wb) {
 		super();
+		workbook = wb; 
 		setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
 	}
 	
@@ -39,7 +45,7 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 		Object valueAt = table.getModel().getValueAt(table.convertRowIndexToModel(row), table.convertColumnIndexToModel(column));
 		setOpaque(true);
 		
-		setCellBackground(table, valueAt, isSelected, cell, column);
+		setCellBackground(table, valueAt, isSelected, cell, column, row);
 		
 		return cell;
 	}
@@ -52,7 +58,7 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	 * @param cell The cell that is being rendered 
 	 * @param column The column containing the cell in the view coordinates
 	 */
-	public void setCellBackground(JTable table, Object valueAt, boolean isSelected, Component cell, int column) {
+	public void setCellBackground(JTable table, Object valueAt, boolean isSelected, Component cell, int column, int row) {
 		cell.setBackground(null);
 		if (valueAt != null) {
 			int val = Integer.parseInt(valueAt.toString());	// Convert the cells value to an int (all values in the table are originally type Integer)
@@ -63,6 +69,12 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	 		else if(table.convertColumnIndexToModel(column) > 1 && table.convertColumnIndexToModel(column) < (table.getColumnCount()-2)) {
 	 			if(val != 0) {
 	 				cell.setBackground(Color.lightGray); 
+	 			}
+	 		}
+	 		else if(table.convertColumnIndexToModel(column) == table.getColumnCount()-1) {
+	 			Integer partNumber = (Integer) table.getModel().getValueAt(table.convertRowIndexToModel(row), 0);
+	 			if(workbook.checkBelowMin(partNumber, val)){
+	 				cell.setBackground(Color.pink);
 	 			}
 	 		}
 	        if(isSelected) {

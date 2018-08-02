@@ -30,6 +30,7 @@ public class OrderStock implements Stock {
 	private Workbook workbook;
 	private Sheet pickList;
 	private int rowCount;
+	private InventoryWorkbook invWB;
 	
 	/**
 	 * Final fields used in this class
@@ -44,11 +45,12 @@ public class OrderStock implements Stock {
 	 * @param table Contains data from the current table in its table model
 	 * @param wb The workbook in which the pick list sheet will be created
 	 */
-	public OrderStock(DataTable table, Workbook wb) {
+	public OrderStock(DataTable table, Workbook wb, InventoryWorkbook invWB) {
 		
 		tableModel = table.getTableModel();
 		workbook = wb;
 		tableData = tableModel.getDataVector();
+		this.invWB = invWB;
 		rowCount = 0;
 	}
 	
@@ -132,9 +134,10 @@ public class OrderStock implements Stock {
 	 */
 	public void createPickList() {
 		
-		CellStyle greyStyle = createCellStyle(11, IndexedColors.GREY_25_PERCENT.getIndex(), false);
-		CellStyle deficitStyle = createCellStyle(11, IndexedColors.YELLOW.getIndex(), false);
-		CellStyle borderStyle = createCellStyle(11, IndexedColors.WHITE.getIndex(), false);
+		CellStyle greyStyle = createCellStyle(12, IndexedColors.GREY_25_PERCENT.getIndex(), false);
+		CellStyle deficitStyle = createCellStyle(12, IndexedColors.YELLOW.getIndex(), false);
+		CellStyle borderStyle = createCellStyle(12, IndexedColors.WHITE.getIndex(), false);
+		CellStyle minStyle = createCellStyle(12, IndexedColors.PINK1.getIndex(), false);
 		addBorder(greyStyle);
 		addBorder(deficitStyle);
 		addBorder(borderStyle);
@@ -150,11 +153,15 @@ public class OrderStock implements Stock {
 				}
 				else if(cellCount == v.size()-1) {
 					int cellVal = i.intValue() >= 0 ? i.intValue() : 0;	// This is the quantity remaining column on the table 
-					int invQty = v.get(1);	// The inventory quantity should always be in column 1
-					CellStyle style = i.intValue() < 0 ? deficitStyle : borderStyle;
-					createCell(dataRow, cellCount, new Integer(invQty - cellVal), style);	// This is the quantity to be taken out of inventory
+					int invQty = v.get(1).intValue();	// The inventory quantity should always be in column 1
+					Integer partNum = v.get(0);
+					createCell(dataRow, cellCount, new Integer(invQty - cellVal), borderStyle);	// This is the quantity to be taken out of inventory
 					cellCount++;
-					createCell(dataRow, cellCount, cellVal, borderStyle); // This is the quantity remaining in inventory
+					CellStyle style = invWB.checkBelowMin(partNum, cellVal) ? minStyle : borderStyle;
+					if(i.intValue() < 0) {
+						style = deficitStyle;
+					}
+					createCell(dataRow, cellCount, cellVal, style); // This is the quantity remaining in inventory
 				}
 				else {
 					createCell(dataRow, cellCount, i, borderStyle);
