@@ -141,6 +141,7 @@ public class OrderStock implements Stock {
 		addBorder(greyStyle);
 		addBorder(deficitStyle);
 		addBorder(borderStyle);
+		addBorder(minStyle);
 		
 		for(Vector<Integer> v : tableData) {
 			Row dataRow = pickList.createRow(rowCount);

@@ -160,13 +160,20 @@ public class InventoryWorkbook implements WorkbookInterface {
 		while(iter.hasNext()) {
 			Pair invUpdatePair = iter.next();
 			Pair partListPair = partList.get(invUpdatePair.first); // Get the part # entry in the inventory part list with the part # from the invUpdate
-			Row row = sheet.getRow(partListPair.second); // Get this part #'s row in the inventory work book that was previously saved
-			Cell cell = row.getCell(1); // Get the quantity cell for this part # 
-			cell.setCellValue(invUpdatePair.second.intValue()); // Update the inventory workbook with the new quantity as reflected on the table  
 			
-			partListPair.first = invUpdatePair.second; // Update the part list with the new qty value
-			
-			updateMessage += invUpdatePair.first.toString() + " | " + invUpdatePair.second.toString() + "\n";
+			/* Parts that were found in work orders but not in the inventory workbook were added to the part list with a quantity and
+			 * minimum value of zero to be correctly processed. To signify that these parts were not on the original inventory
+			 * workbook, their row values were set to null. As such, we want to ignore all parts with null row values.
+			 */
+			if(partListPair.second != null) {
+				Row row = sheet.getRow(partListPair.second); // Get this part #'s row in the inventory work book that was previously saved
+				Cell cell = row.getCell(1); // Get the quantity cell for this part # 
+				cell.setCellValue(invUpdatePair.second.intValue()); // Update the inventory workbook with the new quantity as reflected on the table  
+				
+				partListPair.first = invUpdatePair.second; // Update the part list with the new qty value
+				
+				updateMessage += invUpdatePair.first.toString() + " | " + invUpdatePair.second.toString() + "\n";
+			}
 		}
 		
 		try {
@@ -193,13 +200,20 @@ public class InventoryWorkbook implements WorkbookInterface {
 		while(iter.hasNext()) {
 			Pair invUpdatePair = iter.next();
 			Pair partListPair = partList.get(invUpdatePair.first); // Get the part # entry in the inventory part list with the part # from the invUpdate
-			Row row = sheet.getRow(partListPair.second); // Get this part #'s row in the inventory work book that was previously saved
-			Cell cell = row.getCell(1); // Get the quantity cell for this part # 
-			cell.setCellValue(invUpdatePair.second.intValue()); // Update the inventory workbook with the new quantity as reflected on the table  
 			
-			partListPair.first = invUpdatePair.second; // Update the part list with the new qty value
-			
-			updateMessage += invUpdatePair.first.toString() + " | " + invUpdatePair.second.toString() + "\n";
+			/* Parts that were found in work orders but not in the inventory workbook were added to the part list with a quantity and
+			 * minimum value of zero to be correctly processed. To signify that these parts were not on the original inventory
+			 * workbook, their row values were set to null. As such, we want to ignore all parts with null row values.
+			 */
+			if(partListPair.second != null) {
+				Row row = sheet.getRow(partListPair.second); // Get this part #'s row in the inventory work book that was previously saved
+				Cell cell = row.getCell(1); // Get the quantity cell for this part # 
+				cell.setCellValue(invUpdatePair.second.intValue()); // Update the inventory workbook with the new quantity as reflected on the table  
+				
+				partListPair.first = invUpdatePair.second; // Update the part list with the new qty value
+				
+				updateMessage += invUpdatePair.first.toString() + " | " + invUpdatePair.second.toString() + "\n";
+			}
 		}
 		
 		try {
@@ -306,13 +320,25 @@ public class InventoryWorkbook implements WorkbookInterface {
 				Integer partNumValue = new Integer((int)partNumCell.getNumericCellValue());
 				Integer qtyValue = new Integer((int)qtyCell.getNumericCellValue());
 				Integer rowValue = new Integer(row.getRowNum());
-				Integer minValue = new Integer(0);
+				Integer minValue = new Integer(0);	// The default minimum for any part is 0
 				if(checkNumericCellValid(minCell)) {
 					minValue = new Integer((int)minCell.getNumericCellValue());
 				}
 				partList.put(partNumValue, new Pair(qtyValue, rowValue, minValue));
 			}
 		}
+	}
+	
+	/**
+	 * A part can be added to the inventory list internally. This should be used to add parts from work orders
+	 * that were not found in the inventory workbook. We want to treat these as real parts. The row value 
+	 * takes on a null value to signify that this part was not in the inventory workbook originally. 
+	 * @param part The part number
+	 * @param qty The quantity of the part
+	 * @param min The minimum quantity 
+	 */
+	public void addPartToList(Integer part, Integer qty, Integer min) {
+		partList.put(part, new Pair(qty, null, min));
 	}
 	
 	/**

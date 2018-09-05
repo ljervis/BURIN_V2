@@ -136,9 +136,17 @@ public class DataTable {
 				row.add(invQty); 
 			} 
 			else { 
+				// A part has been found on a work order that is not in the inventory workbook
+				// We need to add this part to the table as a real part with 0 inventory
+				// We can add it to the inventory workbook as a part with 0 quantity and a minimum of 0
+				
+				Integer invQty = new Integer(0);
+				invWB.addPartToList(i, invQty, new Integer(0));
+				row.add(invQty);
+				
 				missingParts += i.toString() + ", ";
-//				System.out.println(i.toString() + " not found in inventory workbook");
-				continue;	// If the part was not found in the inventory workbook this row will not be added to the table
+				System.out.println(i.toString() + " not found in inventory workbook");
+//				continue;	// If the part was not found in the inventory workbook this row will not be added to the table
 			}
 					
 			int totalQtyNeeded = 0;
@@ -156,7 +164,8 @@ public class DataTable {
 			tableData.add(row);
 		}
 		if(!missingParts.equals("")) {
-			missingParts = "The following parts were not found in the inventory workbook and will not be shown:\n" + missingParts;
+			missingParts = "The following parts were not found in the inventory workbook:\n" + missingParts + "\nThey will be added to the table with "
+					+ "quantity and minimum values of zero";
 			JOptionPane.showMessageDialog(new JFrame(), missingParts.substring(0, missingParts.lastIndexOf(",")), "Warning", JOptionPane.WARNING_MESSAGE);
 		}
 		return tableData;

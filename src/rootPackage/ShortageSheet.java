@@ -31,14 +31,17 @@ public class ShortageSheet implements Stock {
 	private Vector<Vector<Integer>> tableData;
 	private Workbook workbook;
 	private Sheet shortageSheet;
-	private int rowCount;	// Counter to keep track of what row number is to be added next
+	private Sheet minSheet;
+	private int rowCountShortage;	// Shortage sheet row counter
+	private int rowCountMin;	// Min sheet row counter
 	private String[] headerColumnNames;
 	private InventoryWorkbook invWB; 
 	
 	/**
 	 * Final fields to be used in this class
 	 */
-	private final String SHORT = "Quantity Short/Quantity Remaining";
+	private final String SHORT = "Quantity Short";
+	private final String MIN = "Quantity Remaining";
 	private final String MFG = "MFG Part Number";
 	private final String DES = "Description";
 	private final String SUP = "Supplier";
@@ -57,7 +60,8 @@ public class ShortageSheet implements Stock {
 		tableData = tableModel.getDataVector();
 		workbook = wb; 
 		workOrderWBList = list;
-		rowCount = 0;
+		rowCountShortage = 0;
+		rowCountMin = 0;
 		headerColumnNames = new String[] {SHORT, MFG, DES};	// Supplier is not currently added to the shortage sheet
 		this.invWB = invWB;
 	}
@@ -69,8 +73,11 @@ public class ShortageSheet implements Stock {
 	public void createList() {
 		
 		shortageSheet = workbook.createSheet("Shortage List");
-		createHeaderRow();
+//		minSheet = workbook.createSheet("Parts Below Minimum");
+		createHeaderRowShortage();
+//		createHeaderRowMinimun();
 		createShortageList();
+		createMinList();
 		autoSizeColumns();
 	}
 	
@@ -81,6 +88,7 @@ public class ShortageSheet implements Stock {
 	public void autoSizeColumns() {
 		for(int i = 0; i < 10; i++) {
 			shortageSheet.autoSizeColumn(i); 
+//			minSheet.autoSizeColumn(i);
 		}
 	}
 	
@@ -128,9 +136,9 @@ public class ShortageSheet implements Stock {
 	/**
 	 * Creates a header row for the shortage list sheet using the table model to populate some of the column names
 	 */
-	public void createHeaderRow() {
-		Row headerRow = shortageSheet.createRow(rowCount);
-		rowCount++;
+	public void createHeaderRowShortage() {
+		Row headerRow = shortageSheet.createRow(rowCountShortage);
+		rowCountShortage++;
 		CellStyle headerRowStyle = createCellStyle(16, IndexedColors.GREY_25_PERCENT.getIndex(), true);
 		addBorder(headerRowStyle);
 		//	The header will use all but the last column header names from the table 
@@ -139,6 +147,26 @@ public class ShortageSheet implements Stock {
 		}
 		
 		for(int col = 0; col < headerColumnNames.length; col++) {
+			int adjustedCol = col + tableModel.getColumnCount()-1;
+			createCell(headerRow, adjustedCol, headerColumnNames[col], headerRowStyle);
+		}
+	}
+	
+	/**
+	 * Creates a header row for the minimum list sheet using the table model to populate some of the column names
+	 */
+	public void createHeaderRowMinimun() {
+		Row headerRow = shortageSheet.createRow(rowCountShortage);
+		rowCountShortage++;
+		CellStyle headerRowStyle = createCellStyle(16, IndexedColors.GREY_25_PERCENT.getIndex(), true);
+		addBorder(headerRowStyle);
+		//	The header will use all but the last column header names from the table 
+		for(int col = 0; col < tableModel.getColumnCount()-1; col++) {
+			createCell(headerRow, col, tableModel.getColumnName(col), headerRowStyle);
+		}
+		int currCol = tableModel.getColumnCount()-1;
+		createCell(headerRow, currCol, MIN, headerRowStyle);
+		for(int col = 1; col < headerColumnNames.length; col++) {
 			int adjustedCol = col + tableModel.getColumnCount()-1;
 			createCell(headerRow, adjustedCol, headerColumnNames[col], headerRowStyle);
 		}
@@ -161,19 +189,18 @@ public class ShortageSheet implements Stock {
 		
 		for(Vector<Integer> v : tableData) {
 			int qtyRemaining = v.lastElement().intValue();
-			Integer partNumber = v.get(0);
 			//	Only look at rows with a deficit in the "remaining Qty" column 
 			if(qtyRemaining < 0) {
-				Row dataRow = shortageSheet.createRow(rowCount);
-				rowCount++;
+				Row dataRow = shortageSheet.createRow(rowCountShortage);
+				rowCountShortage++;
 				
 				int cellCount = 0;
 				for(Integer i : v) {
-					if(cellCount == v.size()-2) {
-						createCell(dataRow, cellCount, i, greyStyle);
+					Integer posative = i.intValue() >= 0 ? i : new Integer(i.intValue()*-1);
+					if(cellCount == v.size()-1) {
+						createCell(dataRow, cellCount, posative, greyStyle);
 					}
 					else {
-						Integer posative = i.intValue() >= 0 ? i : new Integer(i.intValue()*-1);
 						createCell(dataRow, cellCount, posative, borderStyle);
 					}
 					cellCount++;
@@ -185,29 +212,44 @@ public class ShortageSheet implements Stock {
 					createCell(dataRow, adjustedCol, getDescriptor(headerColumnNames[col + 1], partNum), borderStyle);
 				}
 			}
-			else if(invWB.checkBelowMin(partNumber, qtyRemaining)) {
-				Row dataRow = shortageSheet.createRow(rowCount);
-				rowCount++;
+		}
+	}
+	
+	/**
+	 * Fills out the minimum list sheet by scanning the table model and using rows have a remaining qty below the minimum. 
+	 * Tries to fill out the final three columns of each row from the work orders that are currently loaded
+	 */
+	public void createMinList() {
+		
+		createHeaderRowMinimun();
+		
+		CellStyle greyStyle = createCellStyle(12, IndexedColors.GREY_25_PERCENT.getIndex(), false);
+		CellStyle borderStyle = createCellStyle(12, IndexedColors.WHITE.getIndex(), false);
+		CellStyle minStyle = createCellStyle(12, IndexedColors.PINK1.getIndex(), false);
+		addBorder(minStyle);
+		addBorder(greyStyle);
+		addBorder(borderStyle);
+		
+		for(Vector<Integer> v : tableData) {
+			int qtyRemaining = v.lastElement().intValue();
+			Integer partNumber = v.get(0);
+			
+			if(qtyRemaining >= 0 && invWB.checkBelowMin(partNumber, qtyRemaining)) {
+				Row dataRow = shortageSheet.createRow(rowCountShortage);
+				rowCountShortage++;
 				
 				int cellCount = 0;
 				for(Integer i : v) {
-					if(cellCount == v.size()-2) {
-						createCell(dataRow, cellCount, i, greyStyle);
-					}
-					else {
-						Integer posative = i.intValue() >= 0 ? i : new Integer(i.intValue()*-1);
-						createCell(dataRow, cellCount, posative, minStyle);
-					}
+					createCell(dataRow, cellCount, i.intValue(), minStyle);
 					cellCount++;
 				}
-				
-				Integer partNum = v.get(0);	// the first element in the vector should be the part number 
 				for(int col = 0; col < headerColumnNames.length - 1; col++) {
 					int adjustedCol = col + cellCount;
-					createCell(dataRow, adjustedCol, getDescriptor(headerColumnNames[col + 1], partNum), borderStyle);
+					createCell(dataRow, adjustedCol, getDescriptor(headerColumnNames[col + 1], partNumber), minStyle);
 				}
 			}
 		}
+		
 	}
 	
 	/**

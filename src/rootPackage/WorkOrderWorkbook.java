@@ -223,6 +223,8 @@ public class WorkOrderWorkbook implements WorkbookInterface {
 	/**
 	 * Parses the work order sheet and populates the part list with these values.
 	 * Quantities are multiplied by the multiplier to simulate multiple work orders.
+	 * Only rows from the work order with valid numeric part and quantity cells 
+	 * will be added to the list
 	 */
 	@Override
 	public void read() {

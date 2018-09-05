@@ -319,8 +319,8 @@ public class Explorator {
 			if(f.getName().equals(workOrderName + ".xlsx")) {
 				try {
 					
-					Integer[] range = new Integer[50];
-					for(int i = 0; i < 50; i++) {
+					Integer[] range = new Integer[200];
+					for(int i = 0; i < 200; i++) {
 						range[i] = new Integer(i+1);
 					}
 					
@@ -346,6 +346,8 @@ public class Explorator {
 						}
 					}
 				}catch(Exception e) {
+					errorMessage("Could not open the Work Order! Make sure the file was not removed from "
+							+ "\nthe \"Work Orders\" folder and the name was not changed.");
 					e.printStackTrace();
 				}
 			}
